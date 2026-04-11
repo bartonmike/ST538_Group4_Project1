@@ -281,8 +281,8 @@ PUMA is also left as character for now — use as a fixed effect with factor(PUM
 # Questions
 
 Paul
-What is the wage penalty (or premium) associated with disability status in Oregon, after controlling for education, occupation, hours worked, and demographics?
-What individual and household characteristics predict lacking health insurance coverage in Oregon, and has the coverage gap by citizenship status narrowed?
+What is the wage penalty (or premium) associated with disability status in Oregon, after controlling for education, occupation, hours worked, and demographics? Outcome: Wage penalty Predictors: Education, occupation, hours worked, demographics
+What individual characteristics predict lacking health insurance coverage in Oregon, and has the coverage gap by citizenship status narrowed? Outcome: lack of health insurance Precitors: Income, education, household size, occupation, hours worked, citizenship status
 
 Mike
 - Can income be predicted from age, education, and location (rural vs urban)? Outcome: Income Predictors: Age Education Location
