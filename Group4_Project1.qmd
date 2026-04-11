@@ -291,11 +291,23 @@ Mike
 
 Kevin
 - can income be predicted from commute time (JWMNP), vehicle (VEH), and location
-Outcome: Income Predictors based on travel arrangements (urban vs rural vs suburb)
+Outcome: Income Predictors based on travel arrangements (urban vs rural vs suburb) 
+Outcome: Income Predictor: Commute Time, Vehicle, Location
 - determining whether the effect of education on income has decreased over time
 comparing different age demographics and seeing if the effect of education on income is different for different cohorts
 Outcome: determining shifts in valuation of degrees over time wrt actual earnings
+Outcome: Income Predictor: Age demographics, Education (Highest Degree Earned)
 
+Question #1
+Idea: Full model and reduced, run an ANOVA
+Can income be predicted from age, education, and location (rural vs urban)? Outcome: Income Predictors: Age, Education, Location, Gender, Race, Birthplace, Family Size
+
+Question #2
+What individual characteristics predict lacking health insurance coverage in Oregon, with additional aspect to Citizenship. Outcome: lack of health insurance Precitors: Income, education, household size, occupation, hours worked, citizenship status
+
+Question #3
+Can income be predicted from commute time (JWMNP), vehicle (VEH), and location
+Outcome: Income Predictors based on travel arrangements (urban vs rural vs suburb)
 
 # Model
 
