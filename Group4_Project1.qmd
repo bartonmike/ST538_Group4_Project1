@@ -290,11 +290,7 @@ Mike
 - How do age, education, hours worked, and occupation affect annual earnings? Outcome: Annual earnings Predictors: Age Education Hours Worked Occupation
 
 Kevin
-- can income be predicted from commute time (JWMNP), vehicle (VEH), and location 
-Outcome: Income Predictors based on travel arrangements (urban vs rural vs suburb)
-- determining whether the effect of education on income has decreased over time 
-comparing different age demographics and seeing if the effect of education on income is different for different cohorts
-Outcome: determining shifts in valuation of degrees over time wrt actual earnings
+
 
 
 # Model
