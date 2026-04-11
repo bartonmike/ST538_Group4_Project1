@@ -285,9 +285,9 @@ What is the wage penalty (or premium) associated with disability status in Orego
 What individual and household characteristics predict lacking health insurance coverage in Oregon, and has the coverage gap by citizenship status narrowed?
 
 Mike
-- Can income be predicted from age, education, and location (rural vs urban)?
-- What factors are associated with spending more than 30% of income on housing? (What factors contribute to household cost burden)
-- How do age, education, hours worked, and occupation affect annual earnings?
+- Can income be predicted from age, education, and location (rural vs urban)? Outcome: Income Predictors: Age Education Location
+- What factors are associated with spending more than 30% of income on housing? (What factors contribute to household cost burden) Outcome: Spending more than 30% of income on housing T/F Predictors: Income, household size, education.
+- How do age, education, hours worked, and occupation affect annual earnings? Outcome: Annual earnings Predictors: Age Education Hours Worked Occupation
 
 Kevin
 
