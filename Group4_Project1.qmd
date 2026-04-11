@@ -5,72 +5,296 @@ format: pdf
 ---
 
 ```{r}
-#| label: install-deps
-#| include: false
-reticulate::virtualenv_create("r-reticulate")
-reticulate::virtualenv_install("r-reticulate", c("requests", "pandas"))
+library(tidyverse)
 ```
+
+# Observe
+
+This analysis draws on the 2020–2024 American Community Survey (ACS) 5-Year Public Use Microdata Sample (PUMS) for Oregon, accessed via the U.S. Census Bureau's API. The ACS PUMS files contain individual-level records for a subsample of approximately five percent of the U.S. population, with disclosure protections applied to prevent identification of specific individuals or households. The 5-year sample pools five consecutive years of survey data, which may assist with our ability to evaluate and produce analysis when considering relatively small subgroups in state-level (Oregon) data. Records are drawn at the Public Use Microdata Area (PUMA) level API, the most granular geography available in the PUMS. The dataset used here includes person-level records and covers a range of demographic, socioeconomic, labor market, and health variables. All income and earnings variables are adjusted to constant dollars using the Census Bureau's provided adjustment factor (ADJINC), and all estimates should be computed using the person weight (PWGTP) to produce population-representative results. (1)
 
 ```{r}
 #| label: install-deps
 #| include: false
-file.edit("~/.Rprofile")
+# reticulate::virtualenv_create("r-reticulate")
+# reticulate::virtualenv_install("r-reticulate", c("requests", "pandas"))
+```
+
+```{r}
+#| label: add-reticulate
+#| include: false
+# file.edit("~/.Rprofile")
 # add in this 
 # Sys.setenv(RETICULATE_PYTHON_ENV = "r-reticulate")
 ```
 
-
-```{python}
-#| label: check-python
-import sys
-print(sys.executable)
-print(sys.version)
+```{r}
+#| label: optional-pyrestart
+#| include: false
+# run the following restart the python session if needed
+# reticulate::py_run_string("import gc; gc.collect()")
 ```
 
 ```{python}
+#| label: fetch-metadata
+#| echo: false
+#| cache: false
+
+import requests
+import json
+from pathlib import Path
+
+METADATA_PATH = Path("data/pums_variables_metadata.json")
+
+variables = [
+    "WAGP", "PINCP", "PERNP", "POVPIP", "HICOV", "ESR",
+    "AGEP", "SEX", "RAC1P", "HISP", "CIT", "YOEP", "MAR", "RELSHIPP",
+    "SCHL", "FOD1P", "SCH",
+    "COW", "WKHP", "WKWN", "NAICSP", "OCCP", "WRK", "JWMNP",
+    "PUMA", "MIG", "MIGSP", "POWSP",
+    "DIS", "DPHY", "DREM", "DEAR", "DEYE",
+    "HINCP", "HHT", "TEN", "VEH",
+    "RETP", "SSP", "SSIP", "PAP", "SEMP",
+    "PWGTP", "ADJINC",
+]
+
+BASE_URL = "https://api.census.gov/data/2024/acs/acs1/pums/variables/{}.json"
+
+if METADATA_PATH.exists():
+    print(f"Loading metadata from cache: {METADATA_PATH}")
+    with open(METADATA_PATH) as f:
+        metadata = json.load(f)
+else:
+    print("Fetching variable metadata from Census API...")
+    METADATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+    metadata = {}
+
+    for var in variables:
+        response = requests.get(BASE_URL.format(var), timeout=30)
+        if response.status_code == 200:
+            metadata[var] = response.json()
+            print(f"  OK: {var}")
+        else:
+            print(f"  FAILED: {var} — {response.status_code}")
+
+    with open(METADATA_PATH, "w") as f:
+        json.dump(metadata, f, indent=2)
+
+    print(f"\nSaved metadata for {len(metadata)} variables to {METADATA_PATH}")
+
+# Preview one variable
+print(json.dumps(metadata.get("WAGP", {}), indent=2))
+```
+
+
+# Scrub
+```{python}
 #| label: fetch-pums
-#| echo: false        # hide code in output, remove if you want it shown
-#| cache: true        # cache the chunk so it doesn't re-run on every render
+#| echo: false
+#| cache: false
 
 import requests
 import pandas as pd
+from pathlib import Path
 
 API_KEY = "a8f34453c39e419470f405353250f662a508d821"
 YEAR = 2024
 STATE = "41"
+CACHE_PATH = Path("data/pums_oregon_2024.csv")
 
-# Example: pull age, sex, income, and employment status
 variables = [
     # Outcomes
     "WAGP", "PINCP", "PERNP", "POVPIP", "HICOV", "ESR",
     # Core demographics
-    "AGEP", "SEX", "RAC1P", "HISP", "CIT", "NATIVITY", "YOEP", "MAR", "RELSHIPP",
+    "AGEP", "SEX", "RAC1P", "HISP", "CIT", "YOEP", "MAR", "RELSHIPP",
     # Education
-    "SCHL", "FOD1P", "SCHG", "SCH",
+    "SCHL", "FOD1P", "SCH",
     # Labor market
-    "COW", "WKHP", "WKW", "NAICSP", "OCCP", "WRK", "JWTRNS", "JWMNP",
+    "COW", "WKHP", "WKWN", "NAICSP", "OCCP", "WRK", "JWMNP",
     # Geography
-    "ST", "PUMA", "MIG", "MIGSP", "POWSP",
+    "PUMA", "MIG", "MIGSP", "POWSP",
     # Disability & health
     "DIS", "DPHY", "DREM", "DEAR", "DEYE",
     # Household context
-    "HINCP", "HHT", "NRC", "PAOC", "TEN", "VEH",
+    "HINCP", "HHT", "TEN", "VEH",
     # Income components
     "RETP", "SSP", "SSIP", "PAP", "SEMP",
     # Weights & adjustments
-    "PWGTP", "ADJINC"
-    ]  # PWGTP = person weight
+    "PWGTP", "ADJINC",
+]
 
-url = (
-    f"https://api.census.gov/data/{YEAR}/acs/acs5/pums"
-    f"?get={','.join(variables)}"
-    f"&for=state:{STATE}"
-    f"&key={API_KEY}"
-)
-
-response = requests.get(url, timeout=60)
-response.raise_for_status()
-
-data = response.json()
-pums = pd.DataFrame(data[1:], columns=data[0])
+if CACHE_PATH.exists():
+    print(f"Loading from local cache: {CACHE_PATH}")
+    pums = pd.read_csv(CACHE_PATH, low_memory=False)
+    print(f"Loaded: {len(pums):,} rows, {pums.shape[1]} columns")
+else:
+    print(f"Cache not found — fetching from Census API...")
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    url = (
+        f"https://api.census.gov/data/{YEAR}/acs/acs5/pums"
+        f"?get={','.join(variables)}"
+        f"&for=state:{STATE}"
+        f"&key={API_KEY}"
+    )
+    response = requests.get(url, timeout=60)
+    print(f"Status code: {response.status_code}")
+    if response.status_code == 200:
+        data = response.json()
+        pums = pd.DataFrame(data[1:], columns=data[0])
+        pums.to_csv(CACHE_PATH, index=False)
+        print(f"Saved to {CACHE_PATH}: {len(pums):,} rows, {pums.shape[1]} columns")
+    else:
+        print(f"Error: {response.text[:500]}")
 ```
+```{r}
+#| label: load-pums
+#| echo: false
+
+pums <- read_csv("data/pums_oregon_2024.csv", show_col_types = FALSE)
+
+glimpse(pums)
+```
+```{r}
+#| label: scrub-pums
+#| echo: false
+#| cache: true
+
+library(tidyverse)
+
+pums_clean <- pums |>
+
+  # --- Remove group quarters records ---
+  # HINCP = -60000 is the GQ/vacant sentinel per metadata
+  filter(HINCP != -60000) |>
+
+  # --- Apply income adjustment factor ---
+  # ADJINC already divided by 1e6 when read in as decimal (1.222017)
+  mutate(
+    across(c(WAGP, PINCP, PERNP, HINCP, RETP, SSP, SSIP, PAP, SEMP), 
+           ~ .x * ADJINC)
+  ) |>
+
+  # --- Recode N/A sentinels to NA ---
+  mutate(
+    # Income vars: age-based N/A
+    WAGP  = na_if(WAGP,  -1 * ADJINC),       # under 15
+    PERNP = na_if(PERNP, -10001 * ADJINC),   # under 16
+    PINCP = na_if(PINCP, -19999 * ADJINC),   # under 15
+    RETP  = na_if(RETP,  -1 * ADJINC),       # under 15
+    SSP   = na_if(SSP,   -1 * ADJINC),       # under 15
+    SSIP  = na_if(SSIP,  -1 * ADJINC),       # under 15
+    PAP   = na_if(PAP,   -1 * ADJINC),       # under 15
+    SEMP  = na_if(SEMP,  -10001 * ADJINC),   # under 15
+    # Other N/A sentinels
+    POVPIP = na_if(POVPIP, -1),              # not computed
+    ESR    = na_if(ESR, 0),                  # under 16
+    YOEP   = na_if(YOEP, 1937),             # born in US
+    HHT    = na_if(HHT, 0),                 # GQ/vacant
+    TEN    = na_if(TEN, 0),                 # GQ/vacant
+    VEH    = na_if(VEH, -1),               # GQ/vacant
+    DPHY   = na_if(DPHY, 0),               # under 5
+    DREM   = na_if(DREM, 0),               # under 5
+  ) |>
+
+  # --- Recode binary vars to logical (1=Yes, 2=No) ---
+  mutate(
+    across(c(DPHY, DREM, DEAR, DEYE, DIS), ~ .x == 1),
+    HICOV = HICOV == 1,                     # 1=insured, 2=not
+  ) |>
+
+  # --- Recode categorical vars as factors with labels from metadata ---
+  mutate(
+    SEX = factor(SEX, levels = c(1, 2),
+                 labels = c("Male", "Female")),
+
+    RAC1P = factor(RAC1P, levels = 1:9,
+                   labels = c("White alone", "Black or African American alone",
+                              "American Indian alone", "Alaska Native alone",
+                              "AIAN tribes specified", "Asian alone",
+                              "Native Hawaiian and Other Pacific Islander alone",
+                              "Some other race alone", "Two or More Races")),
+
+    HISP_binary = factor(if_else(HISP == "01", "Not Hispanic", "Hispanic")),
+
+    CIT = factor(CIT, levels = 1:5,
+                 labels = c("Born in US", "Born in PR/territories",
+                            "Born abroad of US citizen parent",
+                            "Naturalized citizen", "Not a US citizen")),
+
+    MAR = factor(MAR, levels = 1:5,
+                 labels = c("Married", "Widowed", "Divorced",
+                            "Separated", "Never married")),
+
+    ESR = factor(ESR, levels = 1:6,
+                 labels = c("Civilian employed at work",
+                            "Civilian employed not at work",
+                            "Unemployed",
+                            "Armed Forces at work",
+                            "Armed Forces not at work",
+                            "Not in labor force")),
+
+    SCH = factor(SCH, levels = 1:3,
+                 labels = c("Not enrolled", "Public school", "Private school")),
+
+    COW = factor(COW, levels = 0:9,
+                 labels = c("N/A", "Private for-profit", "Private nonprofit",
+                            "Local govt", "State govt", "Federal govt",
+                            "Self-emp incorporated", "Self-emp not incorporated",
+                            "Working without pay", "Unemployed last 5 years")),
+
+    MIG = factor(MIG, levels = 1:3,
+                 labels = c("Same house", "Outside US", "Different house in US")),
+
+    HHT = factor(HHT, levels = 1:7,
+                 labels = c("Married couple household",
+                            "Other family: male householder no spouse",
+                            "Other family: female householder no spouse",
+                            "Nonfamily: male householder living alone",
+                            "Nonfamily: male householder not living alone",
+                            "Nonfamily: female householder living alone",
+                            "Nonfamily: female householder not living alone")),
+
+    TEN = factor(TEN, levels = 1:4,
+                 labels = c("Owned with mortgage", "Owned free and clear",
+                            "Rented", "Occupied without payment")),
+
+    WRK = factor(WRK, levels = 0:2,
+                 labels = c("N/A", "Worked last week", "Did not work last week")),
+  ) |>
+
+  # --- Drop redundant columns ---
+  select(-ADJINC, -HISP, -state) |>
+
+  # --- Ensure PWGTP is positive ---
+  filter(!is.na(PWGTP), PWGTP > 0)
+
+glimpse(pums_clean)
+```
+Notes on scrub
+HISP is replaced by HISP_binary (Hispanic vs not) — the 24-level detailed version is too granular for most models. Keep the original HISP if you need it.
+WAGP and PINCP will still need log transformation before use as outcomes — do that in the model chunk rather than here so the untransformed values stay available.
+FOD1P, NAICSP, OCCP, MIGSP, POWSP are left as character, they have hundreds of codes and are better aggregated to major groups in a separate prep step depending on your research question.
+PUMA is also left as character for now — use as a fixed effect with factor(PUMA) in the model call.
+
+# Explore
+
+
+# Questions
+
+Paul
+What is the wage penalty (or premium) associated with disability status in Oregon, after controlling for education, occupation, hours worked, and demographics?
+What individual and household characteristics predict lacking health insurance coverage in Oregon, and has the coverage gap by citizenship status narrowed?
+
+Mike
+
+
+Kevin
+
+
+
+# Model
+
+# iNterpret
+
+# Citations
+
+1. U.S. Census Bureau. (2026). 2020–2024 American Community Survey 5-year Public Use Microdata Sample (PUMS). U.S. Department of Commerce. https://www.census.gov/programs-surveys/acs/microdata.html
