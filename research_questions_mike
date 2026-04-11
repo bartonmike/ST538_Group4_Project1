@@ -1,1 +1,20 @@
+## Question 1
+
+Can income be predicted from age, education, and location (rural vs urban)?
+
+Income ~ Age + Age^2 + Education + Location
+
+income can be right skewed, so might try a log(income)
+
+## Question 2
+
+How do age, education, hours worked, and occupation affect annual earnings?
+
+Income∼Age+Age2+Education+HoursWorked+Occupation
+
+## Question 3
+
+What factors are associated with spending more than 30% of income on housing?
+
+HousingBurden (yes/no) ~ Income + HouseholdSize + Region + Education
 
