@@ -120,7 +120,7 @@ variables = [
     # Income components
     "RETP", "SSP", "SSIP", "PAP", "SEMP",
     # Weights & adjustments
-    "PWGTP", "ADJINC",
+    "PWGTP", "ADJINC","MET2013",
 ]
 
 if CACHE_PATH.exists():
@@ -394,6 +394,13 @@ Outcome: Income Predictor: Age demographics, Education (Highest Degree Earned)
 Question #1
 Idea: Full model and reduced, run an ANOVA
 Can income be predicted from age, education, and location (rural vs urban)? Outcome: Income Predictors: Age, Education, Location, Gender, Race, Birthplace, Family Size
+
+```{r}
+#lm(ADJINC~age+education+rural+gender+race+birthplace, data=pums_clean)
+# Urban/Rural is hard to codify in the data, so it may be best to not include it.
+lm(PINCP~AGEP+AGEP^2+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary), data=pums_clean)
+```
+
 
 Question #2
 What individual characteristics predict lacking health insurance coverage in Oregon, with additional aspect to Citizenship. Outcome: lack of health insurance Precitors: Income, education, household size, occupation, hours worked, citizenship status
