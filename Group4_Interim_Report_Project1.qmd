@@ -1,6 +1,6 @@
 ---
 title: "Group 4 Project 1: Interim Report"
-author: Paul Anderson, Michael Barton, Kevin Kincade
+author: Paul Anderson, Michael Barton, Kevin Kincaid
 format: pdf
 ---
 
@@ -347,9 +347,13 @@ library(skimr)
 library(corrr)
 ```
 
+After our initial proposal, we did exploratory analysis for each question. We decided to pursue question 1, which was “What factors are most impactful when predicting income?”. The process was to develop a full model and then run ANOVA to determine a viable reduced model. 
+
 ## Can income be predicted from selected ACS Data
 
 ### Exploratory Data Analysis
+
+We begin by exploring the relationship between income and our key predictors: age, education, gender, race, location and number of household members. 
 
 ```{r}
 hist(pums_clean$PINCP)
@@ -363,7 +367,7 @@ ggplot(pums_clean, aes(x = AGEP, y = PINCP)) +
   labs(title = "Income vs Age")
 ```
 
-
+The above summary statistics indicate that income (PINCP) is highly right-skewed, with a small number of individuals earning substantially more than the median. Because of this skewness, we will consider applying a log transformation to the income response when evaluating model fit for the final report. The scatterplot of income versus age suggests a nonlinear relationship: income tends to increase with age early in life, plateau in middle age, and decline slightly at older ages. This pattern suggests the inclusion of a quadratic age term in the regression model.
 
 ```{r}
 ggplot(pums_clean, aes(x = SCHL, y = PINCP)) +
@@ -372,7 +376,6 @@ ggplot(pums_clean, aes(x = SCHL, y = PINCP)) +
   labs(title = "Income vs Education", x = "Years of School (Education)", y = "Income")
   
 ```
-
 
 ```{r}
 ggplot(pums_clean, aes(x = factor(SEX), y = PINCP)) +
@@ -401,11 +404,7 @@ ggplot(pums_clean, aes(x = factor(RAC1P), y = PINCP)) +
 ```
 
 
-We begin by exploring the relationship between income and the key predictors: age, education, gender, race, location and number of household members. Summary statistics indicate that income (PINCP) is highly right-skewed, with a small number of individuals earning substantially more than the median. Because of this skewness, we will consider applying a log transformation to the income response when evaluating model fit for the final report.
-
-A scatterplot of income versus age suggests a nonlinear relationship: income tends to increase with age early in life, plateau in middle age, and decline slightly at older ages. This pattern suggests the inclusion of a quadratic age term in the regression model. Education shows a strong positive association with income, with higher educational attainment corresponding to higher earnings. Boxplots of income by gender and race reveal noticeable differences in median income across groups, suggesting these variables should be included as categorical predictors.
-
-Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.
+As shown above, education shows a strong positive association with income, with higher educational attainment corresponding to higher earnings. Boxplots of income by gender and race reveal noticeable differences in median income across groups, suggesting these variables should be included as categorical predictors. Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.
 
 ```{r}
 
@@ -413,6 +412,11 @@ Overall, the exploratory analysis indicates that income is associated with multi
 
 
 ### Preliminary Models
+
+Based on our analysis of the data, we fit multiple linear regression models to assess how well income can be predicted from the selected variables. The initial full model is:
+
+
+Income∼Age+Age^2+Education+Gender+Race+Birthplace+Household members
 
 ```{r}
 # Urban/Rural is hard to codify in the data, so it may be best to not include it.
@@ -435,13 +439,12 @@ anova(model2, model3)
 ```
 
 
-We fit multiple linear regression models to assess how well income can be predicted from the selected variables. The initial full model is:
 
-Income∼Age+Age^2+Education+Gender+Race+Birthplace+Household members
 
 Income is modeled as a continuous response, and predictors include both continuous variables (age, education, household members) and categorical variables (gender, race, birthplace). A quadratic term for age is included to capture the nonlinear relationship observed in the exploratory analysis.
 
 A reduced model excluding birthplace and household members is also considered due to weak initial evidence of its importance:
+
 
 Income∼Age+Age^2+Education+Gender+Race
 
@@ -464,17 +467,17 @@ Multicollinearity was assessed using variance inflation factors (VIF). All predi
 
 Model selection was performed using both hypothesis testing and goodness-of-fit measures. An ANOVA comparison between models with and without the quadratic age term showed that including age squared significantly improves model fit (p < 0.001). In contrast, the inclusion of location (birthplace) did not significantly improve the model and resulted in only a negligible increase in R². Therefore, location was removed from the final model.
 
+
 The final selected model is:
 
 Income∼Age+Age^2+Education+Gender+Race
 
 ### Conclusions
 
-The analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
+Our analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
 
-Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income.
+Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income. Going forward there are additional factors to consider. One would be exploring additional variables for positive associates with income that could be added to the model. Another option is testing interaction terms. We could also consider whether gender and race are impactful enough that we should really be developing separate models in order to accurately capture the full impact these categorical variables have on all other aspects. 
 
-NEEDS A BIT MORE.
 
 ## Citations
 
