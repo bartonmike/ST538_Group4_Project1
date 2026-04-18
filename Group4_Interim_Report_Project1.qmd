@@ -1,0 +1,485 @@
+---
+title: "Group 4 Project 1: Interim Report"
+author: Paul Anderson, Michael Barton, Kevin Kincade
+format: pdf
+---
+
+```{r include: false}
+library(tidyverse)
+```
+
+
+```{r}
+#| label: install-deps
+#| include: false
+# reticulate::virtualenv_create("r-reticulate")
+# reticulate::virtualenv_install("r-reticulate", c("requests", "pandas"))
+```
+
+```{r}
+#| label: add-reticulate
+#| include: false
+# file.edit("~/.Rprofile")
+# add in this 
+# Sys.setenv(RETICULATE_PYTHON_ENV = "r-reticulate")
+```
+
+```{r}
+#| label: optional-pyrestart
+#| include: false
+# run the following restart the python session if needed
+# reticulate::py_run_string("import gc; gc.collect()")
+```
+
+```{python}
+#| label: fetch-metadata
+#| echo: false
+#| cache: false
+
+import requests
+import json
+from pathlib import Path
+
+METADATA_PATH = Path("data/pums_variables_metadata.json")
+
+variables = [ # added POBP, JWTRNS, NRC
+    "WAGP", "PINCP", "PERNP", "POVPIP", "HICOV", "ESR",
+    "AGEP", "SEX", "RAC1P", "HISP", "CIT", "YOEP", "MAR", "RELSHIPP",
+    "POBP", "SCHL", "FOD1P", "SCH", "COW", "WKHP", "WKWN", "NAICSP", "OCCP", 
+    "WRK", "JWMNP", "JWTRNS", "PUMA", "MIG", "MIGSP", "POWSP",
+    "DIS", "DPHY", "DREM", "DEAR", "DEYE","HINCP", "HHT", "TEN", "VEH",
+    "NRC", "RETP", "SSP", "SSIP", "PAP", "SEMP",
+    "PWGTP", "ADJINC",
+]
+
+BASE_URL = "https://api.census.gov/data/2024/acs/acs1/pums/variables/{}.json"
+
+if METADATA_PATH.exists():
+    print(f"Loading metadata from cache: {METADATA_PATH}")
+    with open(METADATA_PATH) as f:
+        metadata = json.load(f)
+else:
+    print("Fetching variable metadata from Census API...")
+    METADATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+    metadata = {}
+
+    for var in variables:
+        response = requests.get(BASE_URL.format(var), timeout=30)
+        if response.status_code == 200:
+            metadata[var] = response.json()
+            print(f"  OK: {var}")
+        else:
+            print(f"  FAILED: {var} — {response.status_code}")
+
+    with open(METADATA_PATH, "w") as f:
+        json.dump(metadata, f, indent=2)
+
+    print(f"\nSaved metadata for {len(metadata)} variables to {METADATA_PATH}")
+
+# Preview one variable
+print(json.dumps(metadata.get("WAGP", {}), indent=2))
+```
+
+
+
+```{python}
+# Scrub
+#| label: fetch-pums
+#| echo: false
+#| cache: false
+
+import requests
+import pandas as pd
+from pathlib import Path
+
+API_KEY = "a8f34453c39e419470f405353250f662a508d821"
+YEAR = 2024
+STATE = "41"
+CACHE_PATH = Path("data/pums_oregon_2024.csv")
+
+variables = [
+    # Outcomes
+    "WAGP", "PINCP", "PERNP", "POVPIP", "HICOV", "ESR",
+    # Core demographics
+    "AGEP", "SEX", "RAC1P", "HISP", "CIT", "YOEP", "MAR", "RELSHIPP",
+    "POBP",                                                       # added POBP
+    # Education
+    "SCHL", "FOD1P", "SCH",
+    # Labor market
+    "COW", "WKHP", "WKWN", "NAICSP", "OCCP", "WRK", "JWMNP", "JWTRNS", # added
+    # Geography
+    "PUMA", "MIG", "MIGSP", "POWSP",
+    # Disability & health
+    "DIS", "DPHY", "DREM", "DEAR", "DEYE",
+    # Household context
+    "HINCP", "HHT", "TEN", "VEH", "NRC",                            # added NRC
+    # Income components
+    "RETP", "SSP", "SSIP", "PAP", "SEMP",
+    # Weights & adjustments
+    "PWGTP", "ADJINC","NP",
+]
+
+if CACHE_PATH.exists():
+    print(f"Loading from local cache: {CACHE_PATH}")
+    pums = pd.read_csv(CACHE_PATH, low_memory=False)
+    print(f"Loaded: {len(pums):,} rows, {pums.shape[1]} columns")
+else:
+    print(f"Cache not found — fetching from Census API...")
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    url = (
+        f"https://api.census.gov/data/{YEAR}/acs/acs5/pums"
+        f"?get={','.join(variables)}"
+        f"&for=state:{STATE}"
+        f"&key={API_KEY}"
+    )
+    response = requests.get(url, timeout=60)
+    print(f"Status code: {response.status_code}")
+    if response.status_code == 200:
+        data = response.json()
+        pums = pd.DataFrame(data[1:], columns=data[0])
+        pums.to_csv(CACHE_PATH, index=False)
+        print(f"Saved to {CACHE_PATH}: {len(pums):,} rows, {pums.shape[1]} columns")
+    else:
+        print(f"Error: {response.text[:500]}")
+```
+
+```{r}
+#| label: load-pums
+#| echo: false
+
+pums <- read_csv("data/pums_oregon_2024.csv", show_col_types = FALSE)
+
+#glimpse(pums)
+```
+
+```{r}
+#| label: scrub-pums
+#| echo: false
+#| cache: true
+
+library(tidyverse)
+
+pums_clean <- pums |>
+
+  # --- Remove group quarters records ---
+  filter(HINCP != -60000) |>
+
+  # --- Apply income adjustment factor ---
+  mutate(
+    across(c(WAGP, PINCP, PERNP, HINCP, RETP, SSP, SSIP, PAP, SEMP),
+           ~ .x * ADJINC)
+  ) |>
+
+  # --- Recode all N/A sentinels to NA ---
+  mutate(
+    # Income vars: age-based N/A
+    WAGP   = na_if(WAGP,  -1 * ADJINC),
+    PERNP  = na_if(PERNP, -10001 * ADJINC),
+    PINCP  = na_if(PINCP, -19999 * ADJINC),
+    RETP   = na_if(RETP,  -1 * ADJINC),
+    SSP    = na_if(SSP,   -1 * ADJINC),
+    SSIP   = na_if(SSIP,  -1 * ADJINC),
+    PAP    = na_if(PAP,   -1 * ADJINC),
+    SEMP   = na_if(SEMP,  -10001 * ADJINC),
+    # Labor market: 0 = N/A (under 16 or did not work)
+    WKHP   = na_if(WKHP, 0),
+    WKWN   = na_if(WKWN, 0),
+    JWMNP  = na_if(JWMNP, 0),
+    # Other sentinels
+    POVPIP = na_if(POVPIP, -1),
+    ESR    = na_if(ESR, 0),
+    YOEP   = na_if(YOEP, 1937),
+    HHT    = na_if(HHT, 0),
+    TEN    = na_if(TEN, 0),
+    VEH    = na_if(VEH, -1),
+    NRC    = na_if(NRC, -1),
+    DPHY   = na_if(DPHY, 0),
+    DREM   = na_if(DREM, 0),
+    NP     = na_if(NP, 0),
+    # Labor class and work status: 0 = N/A
+    COW    = na_if(COW, 0),
+    WRK    = na_if(WRK, 0),
+  ) |>
+
+  # --- Recode binary vars to logical (1=Yes, 2=No) ---
+  mutate(
+    across(c(DPHY, DREM, DEAR, DEYE, DIS), ~ .x == 1),
+    HICOV = HICOV == 1,
+  ) |>
+
+  # --- Recode categorical vars as factors with labels from metadata ---
+  mutate(
+    SEX = factor(SEX, levels = c(1, 2),
+                 labels = c("Male", "Female")),
+
+    RAC1P = factor(RAC1P, levels = 1:9,
+                   labels = c("White alone", "Black or African American alone",
+                              "American Indian alone", "Alaska Native alone",
+                              "AIAN tribes specified", "Asian alone",
+                              "Native Hawaiian and Other Pacific Islander alone",
+                              "Some other race alone", "Two or More Races")),
+
+    HISP_binary = factor(if_else(HISP == "01", "Not Hispanic", "Hispanic")),
+
+    CIT = factor(CIT, levels = 1:5,
+                 labels = c("Born in US", "Born in PR/territories",
+                            "Born abroad of US citizen parent",
+                            "Naturalized citizen", "Not a US citizen")),
+
+    MAR = factor(MAR, levels = 1:5,
+                 labels = c("Married", "Widowed", "Divorced",
+                            "Separated", "Never married")),
+
+    ESR = factor(ESR, levels = 1:6,
+                 labels = c("Civilian employed at work",
+                            "Civilian employed not at work",
+                            "Unemployed",
+                            "Armed Forces at work",
+                            "Armed Forces not at work",
+                            "Not in labor force")),
+
+    SCH = factor(SCH, levels = 1:3,
+                 labels = c("Not enrolled", "Public school", "Private school")),
+
+    COW = factor(COW, levels = 1:9,
+                 labels = c("Private for-profit", "Private nonprofit",
+                            "Local govt", "State govt", "Federal govt",
+                            "Self-emp incorporated", "Self-emp not incorporated",
+                            "Working without pay", "Unemployed last 5 years")),
+
+    MIG = factor(MIG, levels = 1:3,
+                 labels = c("Same house", "Outside US", "Different house in US")),
+
+    HHT = factor(HHT, levels = 1:7,
+                 labels = c("Married couple household",
+                            "Other family: male householder no spouse",
+                            "Other family: female householder no spouse",
+                            "Nonfamily: male householder living alone",
+                            "Nonfamily: male householder not living alone",
+                            "Nonfamily: female householder living alone",
+                            "Nonfamily: female householder not living alone")),
+
+    TEN = factor(TEN, levels = 1:4,
+                 labels = c("Owned with mortgage", "Owned free and clear",
+                            "Rented", "Occupied without payment")),
+
+    WRK = factor(WRK, levels = 1:2,
+                 labels = c("Worked last week", "Did not work last week")),
+
+    JWTRNS = factor(JWTRNS, levels = 0:12,
+                    labels = c("N/A", "Car truck or van", "Bus",
+                               "Subway or elevated rail",
+                               "Long-distance train or commuter rail",
+                               "Light rail streetcar or trolley",
+                               "Ferryboat", "Taxi or ride-hailing",
+                               "Motorcycle", "Bicycle", "Walked",
+                               "Worked from home", "Other method")),
+
+    POBP_binary = factor(case_when(
+      as.numeric(POBP) <= 56  ~ "Born in US",
+      as.numeric(POBP) == 72  ~ "Born in PR/territories",
+      TRUE                    ~ "Foreign born"
+    )),
+  ) |>
+
+  # --- Drop redundant/replaced columns ---
+  select(-ADJINC, -HISP, -POBP, -state) |>
+
+  # --- Ensure valid person weight ---
+  filter(!is.na(PWGTP), PWGTP > 0)
+
+#glimpse(pums_clean)
+```
+
+
+```{r}
+#| label: eda-overview
+#| echo: false
+
+library(tidyverse)
+library(skimr)
+
+# 1. overall summary
+#skim(pums_clean)
+```
+
+```{r}
+#| label: eda-missingness
+#| echo: false
+```
+
+```{r}
+#| label: eda-income-distributions
+#| echo: false
+
+# Wages among earners only
+
+# Log wages
+
+# Total personal income
+```
+
+```{r}
+#| label: eda-outcome-summaries
+#| echo: false
+
+# Q1/Q3: wage statistics by key groups
+
+# Q2: health insurance coverage rate
+
+# Q2: uninsured rate by citizenship
+```
+
+```{r}
+#| label: eda-categorical-distributions
+#| echo: false
+```
+
+```{r}
+#| label: eda-continuous-distributions
+#| echo: false
+```
+
+```{r}
+#| label: eda-correlations
+#| echo: false
+
+library(corrr)
+```
+
+## Can income be predicted from selected ACS Data
+
+### Exploratory Data Analysis
+
+```{r}
+hist(pums_clean$PINCP)
+hist(log(pums_clean$PINCP))
+```
+
+```{r}
+ggplot(pums_clean, aes(x = AGEP, y = PINCP)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  labs(title = "Income vs Age")
+```
+
+
+
+```{r}
+ggplot(pums_clean, aes(x = SCHL, y = PINCP)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  labs(title = "Income vs Education", x = "Years of School (Education)", y = "Income")
+  
+```
+
+
+```{r}
+ggplot(pums_clean, aes(x = factor(SEX), y = PINCP)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) +
+  scale_x_discrete(labels = c("Male", "Female")) +
+  labs(
+    title = "Income by Gender",
+    x = "Gender",
+    y = "Income"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(pums_clean, aes(x = factor(RAC1P), y = PINCP)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) +
+  labs(
+    title = "Income by Race",
+    x = "Race",
+    y = "Income"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+We begin by exploring the relationship between income and the key predictors: age, education, gender, race, location and number of household members. Summary statistics indicate that income (PINCP) is highly right-skewed, with a small number of individuals earning substantially more than the median. Because of this skewness, we will consider applying a log transformation to the income response when evaluating model fit for the final report.
+
+A scatterplot of income versus age suggests a nonlinear relationship: income tends to increase with age early in life, plateau in middle age, and decline slightly at older ages. This pattern suggests the inclusion of a quadratic age term in the regression model. Education shows a strong positive association with income, with higher educational attainment corresponding to higher earnings. Boxplots of income by gender and race reveal noticeable differences in median income across groups, suggesting these variables should be included as categorical predictors.
+
+Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.
+
+```{r}
+
+```
+
+
+### Preliminary Models
+
+```{r}
+# Urban/Rural is hard to codify in the data, so it may be best to not include it.
+model1 <- lm(PINCP~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary) + NP, data=pums_clean)
+summary(model1)
+
+
+model2 <- lm(PINCP~AGEP+AGEP^2+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model2)
+
+library(car)
+vif(model1)
+
+
+model3 <- lm(PINCP~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model2)
+
+anova(model2, model3)
+
+```
+
+
+We fit multiple linear regression models to assess how well income can be predicted from the selected variables. The initial full model is:
+
+Income∼Age+Age^2+Education+Gender+Race+Birthplace+Household members
+
+Income is modeled as a continuous response, and predictors include both continuous variables (age, education, household members) and categorical variables (gender, race, birthplace). A quadratic term for age is included to capture the nonlinear relationship observed in the exploratory analysis.
+
+A reduced model excluding birthplace and household members is also considered due to weak initial evidence of its importance:
+
+Income∼Age+Age^2+Education+Gender+Race
+
+### Model Checking and Selection
+
+```{r}
+plot(model2, which = 1)
+plot(model2, which = 2)
+
+#model_log <- lm(log(PINCP + 1) ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) + factor(RAC1P), data = pums_clean)
+
+#lot(model_log, which = 1)
+#plot(model_log, which = 2)
+```
+
+
+Model diagnostics were conducted to assess the validity of the linear regression assumptions. Residual plots indicated non-constant variance and right-skewness, which is consistent with the skewed distribution of income. This suggests that a log transformation of income may improve model fit, although the untransformed model is retained for interpretability.
+
+Multicollinearity was assessed using variance inflation factors (VIF). All predictors showed low VIF values (near 1), except for age and age squared, which exhibited moderate collinearity. This is expected due to the polynomial relationship and does not invalidate the model. Centering age can reduce this collinearity but does not change model fit.
+
+Model selection was performed using both hypothesis testing and goodness-of-fit measures. An ANOVA comparison between models with and without the quadratic age term showed that including age squared significantly improves model fit (p < 0.001). In contrast, the inclusion of location (birthplace) did not significantly improve the model and resulted in only a negligible increase in R². Therefore, location was removed from the final model.
+
+The final selected model is:
+
+Income∼Age+Age^2+Education+Gender+Race
+
+### Conclusions
+
+The analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
+
+Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income.
+
+NEEDS A BIT MORE.
+
+## Citations
+
+1. U.S. Census Bureau. (2026). 2020–2024 American Community Survey 5-year Public Use Microdata Sample (PUMS). U.S. Department of Commerce. https://www.census.gov/programs-surveys/acs/microdata.html
+
+2. Mason, H., & Wiggins, C. (2010). A Taxonomy of Data Science. (Archived manuscript / teaching document). Accessed on 4/10/2026 https://introdatasci.dlilab.com/pdf/A_Taxonomy_of_Data_Science.pdf
+
+## Appendix
