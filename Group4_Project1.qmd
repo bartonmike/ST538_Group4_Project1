@@ -37,52 +37,64 @@ For this report we use the OSEMN model for collaborative data science as defined
 ```
 
 ```{python}
-#| label: fetch-metadata
+# Scrub
+#| label: fetch-pums
 #| echo: false
 #| cache: false
 
 import requests
-import json
+import pandas as pd
 from pathlib import Path
 
-METADATA_PATH = Path("data/pums_variables_metadata.json")
+API_KEY = "a8f34453c39e419470f405353250f662a508d821"
+YEAR = 2024
+STATE = "41"
+CACHE_PATH = Path("data/pums_oregon_2024.csv")
 
-variables = [ # added POBP, JWTRNS, NRC
+variables = [
+    # Outcomes
     "WAGP", "PINCP", "PERNP", "POVPIP", "HICOV", "ESR",
+    # Core demographics
     "AGEP", "SEX", "RAC1P", "HISP", "CIT", "YOEP", "MAR", "RELSHIPP",
-    "POBP", "SCHL", "FOD1P", "SCH", "COW", "WKHP", "WKWN", "NAICSP", "OCCP", 
-    "WRK", "JWMNP", "JWTRNS", "PUMA", "MIG", "MIGSP", "POWSP",
-    "DIS", "DPHY", "DREM", "DEAR", "DEYE","HINCP", "HHT", "TEN", "VEH",
-    "NRC", "RETP", "SSP", "SSIP", "PAP", "SEMP",
-    "PWGTP", "ADJINC",
+    "POBP",                                                       # added POBP
+    # Education
+    "SCHL", "FOD1P", "SCH",
+    # Labor market
+    "COW", "WKHP", "WKWN", "NAICSP", "OCCP", "WRK", "JWMNP", "JWTRNS", # added
+    # Geography
+    "PUMA", "MIG", "MIGSP", "POWSP",
+    # Disability & health
+    "DIS", "DPHY", "DREM", "DEAR", "DEYE",
+    # Household context
+    "HINCP", "HHT", "TEN", "VEH", "NRC",                            # added NRC
+    # Income components
+    "RETP", "SSP", "SSIP", "PAP", "SEMP",
+    # Weights & adjustments
+    "PWGTP", "ADJINC","NP",
 ]
 
-BASE_URL = "https://api.census.gov/data/2024/acs/acs1/pums/variables/{}.json"
-
-if METADATA_PATH.exists():
-    print(f"Loading metadata from cache: {METADATA_PATH}")
-    with open(METADATA_PATH) as f:
-        metadata = json.load(f)
+if CACHE_PATH.exists():
+    print(f"Loading from local cache: {CACHE_PATH}")
+    pums = pd.read_csv(CACHE_PATH, low_memory=False)
+    print(f"Loaded: {len(pums):,} rows, {pums.shape[1]} columns")
 else:
-    print("Fetching variable metadata from Census API...")
-    METADATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-    metadata = {}
-
-    for var in variables:
-        response = requests.get(BASE_URL.format(var), timeout=30)
-        if response.status_code == 200:
-            metadata[var] = response.json()
-            print(f"  OK: {var}")
-        else:
-            print(f"  FAILED: {var} — {response.status_code}")
-
-    with open(METADATA_PATH, "w") as f:
-        json.dump(metadata, f, indent=2)
-
-    print(f"\nSaved metadata for {len(metadata)} variables to {METADATA_PATH}")
-
-# Preview one variable
-print(json.dumps(metadata.get("WAGP", {}), indent=2))
+    print(f"Cache not found — fetching from Census API...")
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    url = (
+        f"https://api.census.gov/data/{YEAR}/acs/acs5/pums"
+        f"?get={','.join(variables)}"
+        f"&for=state:{STATE}"
+        f"&key={API_KEY}"
+    )
+    response = requests.get(url, timeout=60)
+    print(f"Status code: {response.status_code}")
+    if response.status_code == 200:
+        data = response.json()
+        pums = pd.DataFrame(data[1:], columns=data[0])
+        pums.to_csv(CACHE_PATH, index=False)
+        print(f"Saved to {CACHE_PATH}: {len(pums):,} rows, {pums.shape[1]} columns")
+    else:
+        print(f"Error: {response.text[:500]}")
 ```
 
 
@@ -120,7 +132,7 @@ variables = [
     # Income components
     "RETP", "SSP", "SSIP", "PAP", "SEMP",
     # Weights & adjustments
-    "PWGTP", "ADJINC",
+    "PWGTP", "ADJINC","MET2013",
 ]
 
 if CACHE_PATH.exists():
@@ -199,6 +211,7 @@ pums_clean <- pums |>
     NRC    = na_if(NRC, -1),
     DPHY   = na_if(DPHY, 0),
     DREM   = na_if(DREM, 0),
+    NP     = na_if(NP, 0),
     # Labor class and work status: 0 = N/A
     COW    = na_if(COW, 0),
     WRK    = na_if(WRK, 0),
@@ -291,7 +304,7 @@ pums_clean <- pums |>
   # --- Ensure valid person weight ---
   filter(!is.na(PWGTP), PWGTP > 0)
 
-glimpse(pums_clean)
+#glimpse(pums_clean)
 ```
 Data Cleaning Notes 2020–2024 ACS 5-Year PUMS (Oregon)
 ACS PUMS uses numeric codes for missing or inapplicable values, so all recoding follows the official Census metadata.
@@ -394,6 +407,49 @@ Outcome: Income Predictor: Age demographics, Education (Highest Degree Earned)
 Question #1
 Idea: Full model and reduced, run an ANOVA
 Can income be predicted from age, education, and location (rural vs urban)? Outcome: Income Predictors: Age, Education, Location, Gender, Race, Birthplace, Family Size
+
+```{r}
+#lm(ADJINC~age+education+rural+gender+race+birthplace, data=pums_clean)
+# Urban/Rural is hard to codify in the data, so it may be best to not include it.
+model1 <- lm(PINCP~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary) + NP, data=pums_clean)
+summary(model1)
+
+
+model2 <- lm(PINCP~AGEP+AGEP^2+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model2)
+```
+
+```{r}
+plot(model2, which = 1)
+plot(model2, which = 2)
+
+model_log <- lm(log(PINCP + 1) ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) + factor(RAC1P), data = pums_clean)
+
+plot(model_log, which = 1)
+plot(model_log, which = 2)
+```
+
+
+```{r}
+library(car)
+vif(model1)
+
+
+model3 <- lm(PINCP~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model2)
+
+anova(model2, model3)
+```
+
+
+```{r}
+ggplot(pums_clean, aes(x = AGEP, y = PINCP)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  labs(title = "Income vs Age")
+```
+
+
 
 Question #2
 What individual characteristics predict lacking health insurance coverage in Oregon, with additional aspect to Citizenship. Outcome: lack of health insurance Precitors: Income, education, household size, occupation, hours worked, citizenship status
