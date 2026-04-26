@@ -205,7 +205,7 @@ pums_clean <- pums |>
     NRC    = na_if(NRC, -1),
     DPHY   = na_if(DPHY, 0),
     DREM   = na_if(DREM, 0),
-    NP     = NP,
+    NP     = na_if(NP, 0),
     # Labor class and work status: 0 = N/A
     COW    = na_if(COW, 0),
     WRK    = na_if(WRK, 0),
@@ -451,7 +451,7 @@ summary(model2)
 vif(model1)
 
 model3 <- lm(PINCP~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
-summary(model3)
+summary(model2)
 
 anova(model2, model3)
 ```
@@ -476,31 +476,6 @@ plot(model2, which = 2)
 #plot(model_log, which = 2)
 ```
 
-
-
-
-```{r}
-#| label: model-1-2-3_log
-#| echo: false
-# Urban/Rural is hard to codify in the data, so it may be best to not include it.
-
-model1_log <- lm(log(PINCP + 1)~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary) + NP, data=pums_clean)
-summary(model1_log)
-
-model2_log <- lm(log(PINCP + 1)~AGEP+AGEP^2+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
-summary(model2_log)
-
-vif(model1_log)
-
-model3_log <- lm(log(PINCP + 1)~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
-summary(model3_log)
-
-anova(model2_log, model3_log)
-
-plot(model2_log, which = 1)
-plot(model2_log, which = 2)
-```
-
 Model diagnostics were conducted to assess the validity of the linear regression assumptions. Residual plots indicated non-constant variance and right-skewness, which is consistent with the skewed distribution of income. This suggests that a log transformation of income may improve model fit, although the untransformed model is retained for interpretability.
 
 Multicollinearity was assessed using variance inflation factors (VIF). All predictors showed low VIF values (near 1), except for age and age squared, which exhibited moderate collinearity. This is expected due to the polynomial relationship and does not invalidate the model. Centering age can reduce this collinearity but does not change model fit.
@@ -511,128 +486,6 @@ Model selection was performed using both hypothesis testing and goodness-of-fit 
 The final selected model is:
 
 Income∼Age+Age^2+Education+Gender+Race
-
-
-
-
-
-```{r}
-
-library(ggplot2)
-library(glmnet)
-library(faraway)
-
-# Put the model formula in one place
-#form <- PINCP ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) + 
-#factor(RAC1P) + factor(POBP_binary) + NP
-
-# Use all variables except PINCP(response) and PERNP (12 month earnings, obvious conflict)
-form <- PINCP ~ . -OCCP -FOD1P - NAICSP +I(AGEP^2) -PERNP -WAGP -PINCP -PERNP -POVPIP -HICOV -ESR -HINCP -RETP -SSP -SEMP
-
-# Keep only rows with complete data for variables in the model
-pums_clean_no_na <- model.frame(form, data = pums_clean, na.action = na.omit)
-
-# Create predictor matrix for glmnet
-# The -1 removes the intercept because glmnet adds its own intercept
-#X <- model.matrix(
-#  PINCP ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) +
-#    factor(RAC1P) + factor(POBP_binary) + NP,
-#  data = pums_clean_no_na
-#)[, -1]
-X <- model.matrix(form, data = pums_clean_no_na)[, -1]
-
-# Create response vector
-y <- as.numeric(pums_clean_no_na$PINCP)
-
-##### Ridge Estimates (alpha = 0)
-
-# Fit ridge regression path (alpha = 0 switches from lasso to ridge)
-# Ridge shrinks coefficients but does NOT set them to zero
-ridge <- glmnet(X, y, alpha = 0)
-
-# Perform cross-validation to find best lambda for ridge
-ridge.cv <- cv.glmnet(X, y, alpha = 0)
-
-# Fit ridge model using lambda that minimizes CV error
-ridge1 <- glmnet(X, y, lambda = ridge.cv$lambda.min, alpha = 0)
-
-# Display ridge coefficients
-# All coefficients remain non-zero (no variable selection)
-ridge1$beta
-
-
-# Extract coefficients from cross-validated ridge model
-# Default is lambda.1se unless otherwise specified
-coef(ridge.cv)
-```
-
-
-```{r}
-##### Lasso Estimates
-lasso <- glmnet(X, y)
-plot(lasso)
-
-lasso.cv <- cv.glmnet(X, y)
-lasso1 <- glmnet(X, y, lambda = lasso.cv$lambda.min)
-lasso1$beta
-lasso2 <- glmnet(X, y, lambda = lasso.cv$lambda.1se)
-lasso2$beta
-
-coef(lasso.cv)
-```
-
-
-```{r}
-# lambda.min
-coef_min <- coef(lasso.cv, s = "lambda.min")
-
-# lambda.1se
-coef_1se <- coef(lasso.cv, s = "lambda.1se")
-
-# remove intercept + keep nonzero
-vars_min <- rownames(coef_min)[coef_min[,1] != 0][-1]
-vars_1se <- rownames(coef_1se)[coef_1se[,1] != 0][-1]
-
-vars_min
-vars_1se
-
-# differences
-setdiff(vars_min, vars_1se)   # dropped in simpler model
-setdiff(vars_1se, vars_min)   # (rare, but possible)
-
-length(vars_min)
-length(vars_1se)
-
-
-plot(lasso.cv)
-
-
-
-# Get coefficients at lambda.1se
-coef_1se <- coef(lasso.cv, s = "lambda.1se")
-
-# Convert to regular vector with names
-coef_vec <- as.vector(coef_1se)
-names(coef_vec) <- rownames(coef_1se)
-
-# Remove intercept and keep only non-zero coefficients
-selected <- coef_vec[-1][coef_vec[-1] != 0]
-
-selected
-
-
-selected_df <- data.frame(
-  variable = names(selected),
-  coefficient = selected
-)
-
-selected_df
-```
-
-
-
-
-
 
 ## Conclusions
 
