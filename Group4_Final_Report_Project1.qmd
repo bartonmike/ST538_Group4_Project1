@@ -15,12 +15,26 @@ knitr::opts_chunk$set(
 ```{r}
 #| label: load in packages
 #| include: false
+#| warning: false
+
+#install.packages("ggfortify")
+
+
 library(tidyverse)
+library(patchwork)
+library(ggplot2)
+library(ggfortify)
+library(glmnet)
+library(faraway)
+library(car)
+library(gt)
 ```
 
-## Introduction: Can income be predicted from selected ACS Data
+## Introduction
 
-In this interim report, we use individual-level data for Oregon residents from the 2020–2024 American Community Survey (ACS) 5-year Public Use Microdata Sample (1). Exploratory analyses were conducted to evaluate each proposed research question, leading us to focus on the question, “What factors are most impactful in predicting income?” Exploratory analysis is used to assess the distribution of income and its relationships with key demographic and socioeconomic variables. Based on the observed patterns, a full multiple linear regression model is specified, and ANOVA-based comparisons are used to identify an appropriate reduced model and evaluate its performance. We then discuss model justification and potential next steps.
+This report analyzes individual-level data for Oregon residents from the 2020–2024 American Community Survey (ACS) 5-year Public Use Microdata Sample (PUMS) (1). The ACS PUMS provides a representative subsample of the U.S. population with detailed demographic, socioeconomic, and labor market information, enabling analysis at the individual level while preserving confidentiality. All analyses account for the survey design through the use of person weights, and income measures are adjusted to constant dollars using the Census Bureau’s adjustment factor.
+
+Following the OSEMN (Obtain, Scrub, Explore, Model, and Interpret) framework (2), we conduct exploratory analyses and develop statistical models to examine relationships between key variables of interest. The primary focus of this report is to identify factors associated with income and other socioeconomic outcomes in Oregon. Specifically, we investigate (1) predictors of income using penalized linear regression, (2) individual characteristics associated with lacking health insurance coverage, and (3) the relationship between income and transportation-related factors such as commute time, vehicle access, and location. These analyses aim to provide insight into the demographic and structural factors that contribute to economic outcomes within the state.
 
 ```{r}
 #| label: install-deps
@@ -365,41 +379,83 @@ library(skimr)
 library(corrr)
 ```
 
+## Question 1: Can income be predicted from selected census variables?
+
 ## Exploratory Data Analysis
 
-We begin by exploring the relationship between income and our key predictors: age, education, gender, race, location and number of household members. 
+We begin by exploring the relationship between income and a few key predictors: age, education, gender, race, place of birth and number of household members.
 
 ```{r}
 #| label: eda-histograms
 #| echo: false
-hist(pums_clean$PINCP)
-hist(log(pums_clean$PINCP))
+#| warning: false
+p1 <-ggplot(data = pums_clean, aes(x = PINCP)) +
+  geom_histogram(binwidth = 30000) + 
+  labs(
+    y = "Count",
+    x = "Personal Income"
+  )
+
+
+p2 <-ggplot(data = pums_clean, aes(x = log(pums_clean$PINCP)+1)) +
+  geom_histogram(binwidth = 1) + 
+  labs(
+    y = "Count",
+    x = "log() of Personal Income"
+  )
+
+p1 + p2 + plot_layout(ncol = 2)
 ```
 
 ```{r}
 #| label: eda-incomevage
 #| echo: false
-ggplot(pums_clean, aes(x = AGEP, y = PINCP)) +
-  geom_point(alpha = 0.2) +
-  geom_smooth(method = "loess") +
-  labs(title = "Income vs Age")
+#| include: false
+
+# This takes a long time to run, adding if statement
+# so it only gets run when needed.
+outfile <- "./eda-incomevage-plot.png"
+
+if (!file.exists(outfile)) {
+  incomevage_plot <- ggplot(pums_clean, aes(x = AGEP, y = PINCP)) +
+    geom_point(alpha = 0.2) +
+    geom_smooth(method = "loess") +
+    scale_y_continuous(labels = label_number()) +
+    labs(title = "Census Data: Personal Income vs Age")
+    ggsave(outfile, plot = incomevage_plot, width = 10, height = 6, dpi = 300)
+}
 ```
 
-The above summary statistics indicate that income (PINCP) is highly right-skewed, with a small number of individuals earning substantially more than the median. Because of this skewness, we will consider applying a log transformation to the income response when evaluating model fit for the final report. The scatterplot of income versus age suggests a nonlinear relationship: income tends to increase with age early in life, plateau in middle age, and decline slightly at older ages. This pattern suggests the inclusion of a quadratic age term in the regression model.
+![Distribution of personal income (PINCP) and log-transformed income, along with income versus age.](./eda-incomevage-plot.png)
+
+The above summary statistics indicate that income (PINCP) is highly right-skewed, with a small number of individuals earning substantially more than the median. Because of this skewness, we applied a log transformation to the income response when evaluating linear model fit for the final report. The scatterplot of income versus age suggests a nonlinear relationship: income tends to increase with age early in life, plateau in middle age, and decline slightly at older ages. This pattern suggests the inclusion of a quadratic age term in the regression model.
 
 ```{r}
 #| label: eda-incomeved
 #| echo: false
-ggplot(pums_clean, aes(x = SCHL, y = PINCP)) +
-  geom_point(alpha = 0.2) +
-  geom_smooth(method = "loess") +
-  labs(title = "Income vs Education", x = "Years of School (Education)", y = "Income")
-  
+#| include: false
+#| warning: false
+
+# This takes a long time to run, adding if statement
+# so it only gets run when needed.
+outfile <- "./eda-incomeved-plot.png"
+
+if (!file.exists(outfile)) {
+  incomeved_plot <- ggplot(pums_clean, aes(x = SCHL, y = PINCP)) +
+    geom_point(alpha = 0.2) +
+    geom_smooth(method = "loess") +
+    scale_y_continuous(labels = label_number()) +
+    labs(title = "Income vs Education", x = "Years of School (Education)", y = "Income")
+  ggsave(outfile, plot = incomeved_plot, width = 10, height = 6, dpi = 300)
+}
 ```
+
+![elationship between income and years of education.](./eda-incomeved-plot.png)
 
 ```{r}
 #| label: eda-incomevgender
 #| echo: false
+#| warning: false
 ggplot(pums_clean, aes(x = factor(SEX), y = PINCP)) +
   geom_boxplot() +
   coord_cartesian(ylim = c(0, 200000)) +
@@ -410,11 +466,14 @@ ggplot(pums_clean, aes(x = factor(SEX), y = PINCP)) +
     y = "Income"
   ) +
   theme_minimal()
+ggsave("./eda-incomevgender-plot.png", width = 10, height = 6, dpi = 300)
 ```
+
 
 ```{r}
 #| label: eda-incomevrace
 #| echo: false
+#| warning: false
 ggplot(pums_clean, aes(x = factor(RAC1P), y = PINCP)) +
   geom_boxplot() +
   coord_cartesian(ylim = c(0, 200000)) +
@@ -424,28 +483,40 @@ ggplot(pums_clean, aes(x = factor(RAC1P), y = PINCP)) +
     y = "Income"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(labels = c(
+    "White alone" = "White",
+    "Black or African American alone" = "Black",
+    "American Indian alone" = "AIAN",
+    "Alaska Native alone" = "Alaska Nat.",
+    "AIAN w/ tribes specified" = "AIAN (tribe)",
+    "Asian alone" = "Asian",
+    "Native Hawaiian and Other Pacific Islander alone" = "NHPI",
+    "Some other race alone" = "Other",
+    "Two or More Races" = "Two or More Races"
+  ))
+ggsave("./eda-incomevrace-plot.png", width = 10, height = 6, dpi = 300)
 ```
 
-As shown above, education shows a strong positive association with income, with higher educational attainment corresponding to higher earnings. Boxplots of income by gender and race reveal noticeable differences in median income across groups, suggesting these variables should be included as categorical predictors. Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.Overall, the exploratory analysis indicates that income is associated with multiple demographic and socioeconomic variables, and that nonlinear effects (particularly for age) may be important.
+attainment corresponding to higher earnings. Boxplots of income by gender and race reveal differences in median income across groups, supporting their inclusion as categorical predictors. Overall, the exploratory analysis suggests that income is influenced by multiple demographic and socioeconomic factors, and that nonlinear effects, particularly for age, should be incorporated into the model.
 
-## Modeling: Preliminary Models
+### Q1: Model Selection
 
 Based on our analysis of the data, we fit multiple linear regression models to assess how well income can be predicted from the selected variables. The initial full model is:
 
-Income∼Age+Age^2+Education+Gender+Race+Birthplace+Household members
+$$Income = Age+Age^2+Education+Gender+Race+Birthplace+Household members$$
 
 ```{r}
-#| label: model-1-2-3
+#| label: q1-model-1-2-3
 #| echo: false
+#| include: false
 # Urban/Rural is hard to codify in the data, so it may be best to not include it.
 
-library(car)
 
 model1 <- lm(PINCP~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary) + NP, data=pums_clean)
 summary(model1)
 
-model2 <- lm(PINCP~AGEP+AGEP^2+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+model2 <- lm(PINCP~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
 summary(model2)
 
 vif(model1)
@@ -454,44 +525,210 @@ model3 <- lm(PINCP~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
 summary(model2)
 
 anova(model2, model3)
+
+
+vif(model2)
 ```
 
-Income is modeled as a continuous response, and predictors include both continuous variables (age, education, household members) and categorical variables (gender, race, birthplace). A quadratic term for age is included to capture the nonlinear relationship observed in the exploratory analysis.
+```{r}
+#| label: q1-model-1-2-3_log
+#| echo: false
+#| include: false
+# Urban/Rural is hard to codify in the data, so it may be best to not include it.
+
+model1_log <- lm(log(PINCP + 1)~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P)+factor(POBP_binary) + NP, data=pums_clean)
+summary(model1_log)
+
+model2_log <- lm(log(PINCP + 1)~AGEP+I(AGEP^2)+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model2_log)
+
+vif(model1_log)
+
+model3_log <- lm(log(PINCP + 1)~AGEP+SCHL+factor(SEX)+factor(RAC1P), data=pums_clean)
+summary(model3_log)
+
+anova(model2_log, model3_log)
+
+vif(model2_log)
+
+
+```
+
+
+```{r}
+#| label: q1-model-lasso
+#| echo: false
+#| include: false
+
+# Use all variables except PINCP(response) The other income related variables
+form <- PINCP ~ . -OCCP -FOD1P - NAICSP +I(AGEP^2) -PERNP -WAGP -PINCP -PERNP -POVPIP -HICOV -ESR -HINCP -RETP -SSP -SEMP
+
+# Keep only rows with complete data for variables in the model
+pums_clean_no_na <- model.frame(form, data = pums_clean, na.action = na.omit)
+
+# Create predictor matrix for glmnet
+# The -1 removes the intercept because glmnet adds its own intercept
+#X <- model.matrix(
+#  PINCP ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) +
+#    factor(RAC1P) + factor(POBP_binary) + NP,
+#  data = pums_clean_no_na
+#)[, -1]
+X <- model.matrix(form, data = pums_clean_no_na)[, -1]
+
+# Create response vector
+y <- as.numeric(pums_clean_no_na$PINCP)
+
+##### Lasso Estimates
+lasso <- glmnet(X, y)
+plot(lasso)
+
+lasso.cv <- cv.glmnet(X, y)
+lasso1 <- glmnet(X, y, lambda = lasso.cv$lambda.min)
+lasso1$beta
+lasso2 <- glmnet(X, y, lambda = lasso.cv$lambda.1se)
+lasso2$beta
+
+#coef(lasso.cv)
+```
+
+
+We also included models of the log income as well. Income is modeled as a continuous response, and predictors include both continuous variables (age, education, household members) and categorical variables (gender, race, birthplace). A quadratic term for age is included to capture the nonlinear relationship observed in the exploratory analysis.
 
 A reduced model excluding birthplace and household members is also considered due to weak initial evidence of its importance:
 
-Income∼Age+Age^2+Education+Gender+Race
+$$Income=Age+Age^2+Education+Gender+Race$$
 
-## Model Checking and Selection
+### Q1: Model Checking and Selection
 
 ```{r}
-#| label: model-plots
+#| label: q1-model-plots 1
 #| echo: false
+#| include: false
+
+# non-log model
 plot(model2, which = 1)
-plot(model2, which = 2)
+#plot(model2, which = 2)
 
-#model_log <- lm(log(PINCP + 1) ~ AGEP + I(AGEP^2) + SCHL + factor(SEX) + factor(RAC1P), data = pums_clean)
-
-#lot(model_log, which = 1)
-#plot(model_log, which = 2)
+#model_log
+plot(model2_log, which = 1)
+#plot(model2_log, which = 2)
 ```
 
-Model diagnostics were conducted to assess the validity of the linear regression assumptions. Residual plots indicated non-constant variance and right-skewness, which is consistent with the skewed distribution of income. This suggests that a log transformation of income may improve model fit, although the untransformed model is retained for interpretability.
+```{r}
+#| label: q1-model-plots2
+#| echo: false
+#| include: false
+#| warning: false
+# Original model
+mp1 <- autoplot(model2, which = 2) + ggtitle("QQ Plot: Original Income")
 
-Multicollinearity was assessed using variance inflation factors (VIF). All predictors showed low VIF values (near 1), except for age and age squared, which exhibited moderate collinearity. This is expected due to the polynomial relationship and does not invalidate the model. Centering age can reduce this collinearity but does not change model fit.
+# Log Model
+mp2 <- autoplot(model2_log, which = 2) + ggtitle("QQ Plot: Log Income")
 
-Model selection was performed using both hypothesis testing and goodness-of-fit measures. An ANOVA comparison between models with and without the quadratic age term showed that including age squared significantly improves model fit (p < 0.001). In contrast, the inclusion of location (birthplace) did not significantly improve the model and resulted in only a negligible increase in R². Therefore, location was removed from the final model.
+combined_plot <- mp1 + mp2 + plot_layout(ncol = 2)
+ggsave("q1-model-plots2.png", plot = combined_plot,
+       width = 10, height = 6, dpi = 300)
+```
+![QQ plots of residuals from linear models using original and log-transformed income.](./q1-model-plots2.png)
 
 
-The final selected model is:
+Model diagnostics were conducted to assess the validity of the linear regression assumptions. Residual plots indicated non-constant variance and right-skewness, which is consistent with the skewed distribution of income. We also conducted and plotted a log transformation of income. The residual plots suggest improves overall fit, although the untransformed model is retained for interpretability. Multicollinearity was assessed using variance inflation factors (VIF). All predictors showed low VIF values (near 1), except for age and age squared, which exhibited moderate collinearity. This is expected due to the polynomial relationship and does not invalidate the model. Centering age can reduce this collinearity but does not change model fit.
 
-Income∼Age+Age^2+Education+Gender+Race
+Alongside the linear model approach, we also evaluated a larger model using penalized linear regression. We separated Personal Income (PINCP) and all other variables in the dataset, leaving out other income related variables, then ran a series of lasso methods on the data to find a model of best fit and of a reduced model (yet still expanded from our linear approach) for better performance. 
+
+While the initial linear regression models were based on a limited set of predictors identified through exploratory analysis, they may omit relevant variables and fail to capture the full complexity of the data. Given the large number of available predictors in the ACS dataset, we expanded the modeling approach to consider a broader set of variables. To manage the resulting increase in dimensionality and potential multicollinearity, we employed penalized linear regression using the LASSO method. LASSO allows us to identify a more targeted set of predictors while maintaining predictive performance. The regularization parameter was selected using cross-validation, with the $\lambda_{lse}$ model chosen to balance model simplicity and accuracy. Figure @q1-lasso-cv-plot presents the cross-validation curve used to select the optimal regularization parameter. While $\lambda_{min}$ achieves the lowest prediction error, the $\lambda_{lse}$ model provides comparable performance with substantially fewer predictors and is therefore selected for interpretation. The resulting set of non-zero coefficients identifies the most influential variables in predicting income.
+
+```{r}
+#| label: q1-lasso-eval
+#| echo: false
+#| warning: false
+
+# lambda.min
+coef_min <- coef(lasso.cv, s = "lambda.min")
+
+# lambda.1se
+coef_1se <- coef(lasso.cv, s = "lambda.1se")
+
+# remove intercept + keep nonzero
+vars_min <- rownames(coef_min)[coef_min[,1] != 0][-1]
+vars_1se <- rownames(coef_1se)[coef_1se[,1] != 0][-1]
+
+# Show both models in full
+#vars_min
+#vars_1se
+
+# Quick compare of size of the models
+#length(vars_min)
+#length(vars_1se)
+```
+
+
+```{r}
+#| label: q1-lasso-cv-plot
+#| fig-cap: "Cross-validation curve for the LASSO model showing mean squared error across values of the regularization parameter lambda."
+#| echo: false
+#| warning: false
+
+plot(lasso.cv)
+```
+
+
+```{r}
+#| label: q1-lasso-coef-table
+#| echo: false
+#| warning: false
+
+# Get coefficients at lambda.1se
+coef_1se <- coef(lasso.cv, s = "lambda.1se")
+
+# Convert to regular vector with names
+coef_vec <- as.vector(coef_1se)
+names(coef_vec) <- rownames(coef_1se)
+
+# Remove intercept and keep only non-zero coefficients
+selected <- coef_vec[-1][coef_vec[-1] != 0]
+#selected
+
+
+selected_df <- data.frame(
+  variable = names(selected),
+  coefficient = selected
+)
+
+selected_df %>%
+  gt() %>%
+  fmt_number(columns = coefficient, decimals = 2) %>%
+  cols_label(
+    variable = "Variable",
+    coefficient = "Coefficient"
+  )
+```
+
+### Q1: Inferences
+
+In the multiple linear regression model, several predictors show statistically significant associations with income. Education has a strong positive effect, indicating that higher educational attainment is associated with increased income, holding other variables constant. Age exhibits a nonlinear relationship with income, with the quadratic term confirming that earnings increase early in life and level off or decline at older ages. Gender and race also show statistically significant differences, suggesting persistent disparities in income across demographic groups. While the overall explanatory power of the model is modest, these results indicate that key demographic and socioeconomic factors contribute meaningfully to variation in income. The LASSO results support these findings by selecting a similar subset of variables, reinforcing the importance of education, labor supply, and demographic characteristics as key predictors of income.
+
+## Question2: 
+
+### Q2: 
+
+### Q2: 
+
+
+
+## Question3: 
+
+### Q3: 
+
+### Q3: 
+
+## Obstacles
 
 ## Conclusions
 
 Our analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
 
-Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income. Going forward there are additional factors to consider. One would be exploring additional variables for positive associates with income that could be added to the model. Another option is testing interaction terms. We could also consider whether gender and race are impactful enough that we should really be developing separate models in order to accurately capture the full impact these categorical variables have on all other aspects. 
+Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income. Going forward there are additional factors to consider. One would be exploring additional variables for positive associations with income that could be added to the model. Another option is testing interaction terms. We could also consider whether gender and race are impactful enough that we should really be developing separate models in order to accurately capture the full impact these categorical variables have on all other aspects. 
 
 
 ## Citations
