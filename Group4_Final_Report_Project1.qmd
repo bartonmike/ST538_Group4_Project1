@@ -716,19 +716,198 @@ In the multiple linear regression model, several predictors show statistically s
 
 
 
-## Question3: 
+## Question3: Can income be predicted from commute time, location, and travel ability?
 
-### Q3: 
+Our third question for analysis was whether income can be predicted from commute time, location, and travel ability. To do this, we design a model to predict income and test it for prediction accuracy. 
 
-### Q3: 
+### Q3: Exploratory Analysis
+
+First, we need to explore the dataset to see how variables are related to income.
+
+```{r}
+#| label: q3-income-v-commute-time
+#| echo: false
+#| warning: false
+ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  labs(title = "Income vs Commute Time")+
+  theme_minimal()
+  
+```
+
+In the above graph comparing commute time (JWMNP) and income (PINCP) we see a sort of conflicting trend in the data. The maximum salary appears to decrease as commutes increase, but there is also a significant cluster of people with shorter commutes that make less money. 
+
+```{r}
+#| label: q3-income-v-commute-time-by-vehicle
+#| echo: false
+#| warning: false
+
+ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "loess") +
+  labs(title = "Income vs Commute Time by Travel Type") + 
+  facet_grid(rows = vars(JWTRNS))+
+  theme(strip.text.y = element_text(angle = 0))+
+  theme_minimal()
+```
+
+The above graphs compare commute time and income but separated by mode of transportation (JWTRNS). This breakdown shows in general, there appears to be a slight decline as the length of commute by any method increases and travel is overwhelmingly done by car.
+
+
+```{r}
+#| label: q3-income-by-area
+#| echo: false
+#| warning: false
+ 
+
+ggplot(pums_true, aes(x = factor(PUMA), y = PINCP)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 100000)) +
+  labs(
+    title = "Income by Area",
+    x = "Area",
+    y = "Income") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+Finally, we compare income based on geographic area. In the initial goal of this question, we wanted the comparison to be city vs suburban vs rural, but the dataset doesn't provide an effective way to determine that categorization.
+
+
+### Q3: Model Fitting
+
+Based on our exploratory analysis. The model we want to go with is: 
+PINCP ~ JWMNP + VEH + factor(JWTRNS) + factor(PUMA)
+
+```{r}
+#| label: q3-model-prep
+#| echo: false
+#| warning: false
+
+#prevent N/A in values
+ pums_true <- pums_clean |> 
+    filter(is.na(PINCP) == FALSE) |>
+    filter(is.na(JWMNP) == FALSE) |>
+    filter(is.na(JWTRNS) == FALSE)
+
+```
+
+
+```{r}
+#| label: q3-model-fit
+#| echo: false
+#| warning: false
+
+
+commutemodel <- lm(PINCP ~ JWMNP + VEH + factor(JWTRNS) + factor(PUMA), 
+  data = pums_clean)
+```
+
+### Q3: Model Checking
+
+```{r}
+#| label: q3-model-summary
+#| echo: false
+#| warning: false
+
+summary(commutemodel)
+  
+```
+
+According to the summary analysis of the model, every variable is statistically significant at p: 0.05 level (or at least some values of the categorical variables, even if not every value). Next we want to check the residuals.
+
+
+```{r}
+#| label: q3-model-residuals
+#| echo: false
+#| warning: false
+
+
+  fit_q1_diag <- broom::augment(commutemodel, data = pums_true)
+  qplot(.fitted, .resid, data = fit_q1_diag)
+
+```
+
+In graphing the residuals, we can see there is still a slight downward trend in the data, and that there is maybe a subgroup in the data that is not fully accounted for. 
+
+Now let us try testing our model for prediction accuracy.To get an accurate sense of how well the model predicts, we fit the model on a randomized 90% of the dataset. We will then asked it to predict the income for the other ten percent, then compare it to the actual value for that observation. This process is repeated multiple times with a fresh model.
+
+```{r}
+#| label: q3-model-predicting
+#| echo: false
+#| message: false
+  
+  repetitions <- 400
+  
+  val1.errors <- rep(NA,repetitions)
+  #val2.errors <- rep(NA,repetitions)
+
+  
+
+  for(i in 1:repetitions){
+  
+    pums_test <- pums_true|>
+      slice_sample(prop=0.1)
+      
+    pums_train<- pums_true |>
+        anti_join(pums_test)
+  
+    pums_eval <- pums_test |> select(PINCP)
+    pums_test <- pums_test |> select(-PINCP)
+  
+  
+    model1 <- lm(PINCP ~ JWMNP + VEH + factor(JWTRNS) + factor(PUMA), 
+        data = pums_train)
+    
+    
+    predictions <- predict(model1, pums_test)
+    #predictions2 <- predict(model2, pums_test)
+  
+    val1.errors[i] <- mean((pums_eval$PINCP-predictions))
+    #val2.errors[i] <- mean((pums_eval$PINCP-predictions2))
+    
+  }
+  #val1.errors  
+  
+  #mean(val2.errors)
+
+
+  
+```
+
+
+
+### Q3: Inferences
+
+```{r}
+
+#| label: q3-model-accuracy
+#| echo: false
+#| message: false
+  
+    mean(val1.errors)
+    qplot(val1.errors, bins = 50 )
+    
+  
+```
+
+After running the testing for a few hundred rounds, we can plot the values to see the mean and variance in accuracy. On average, the model under predicts the value of income within a hundred dollars. However, any specific training of the model can vary wildly, being within about 2 grand on average. Overall, we would say this is a fairlygood predictor for a four-variable model. There are other angles to approach this a question specifically tailored around how home neighborhood, but it would require additional information not collected in this dataset
 
 ## Obstacles
+
+There were a few obstacles we ran into on question 3. One was how best to evaluate predictive accuracy. We knew it needed to be tested across multiple iterations to get an general accuracy, but I also wanted to show the variance between each round. Ultimately we settled on giving the overall mean prediction accuracy, as well as a histogram to demonstrate the spread of predictions. The other issue we faced was in adapting the question 3 "rural" value. As previously mentioned we tried to find a solution to this issue but none of the information within this dataset seemed to fulfill. The area zones are all 100,000 people at least, even if uneven numbers of people were surveyed from each, and there was no variables directly measuring population density or that could be used to determine it. Ultimately we just used area zones as a separate predictive variable instead of specifically "rural/urban" comparison.
+
 
 ## Conclusions
 
 Our analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
 
 Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income. Going forward there are additional factors to consider. One would be exploring additional variables for positive associations with income that could be added to the model. Another option is testing interaction terms. We could also consider whether gender and race are impactful enough that we should really be developing separate models in order to accurately capture the full impact these categorical variables have on all other aspects. 
+
+The analysis shows that we can get a fairly accurate predictor of income based on only a general area zone, commute time, vehicle type, and availability of vehicles. Our predictor varied based on the test/training split but was fairly accurate on average. Further research with this model there are a lot of factors that could be considered such as housing type and rural/suburban/urban living environment, but both of these are outside the information captured by this dataset.
 
 
 ## Citations
