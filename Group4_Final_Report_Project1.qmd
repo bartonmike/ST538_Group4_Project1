@@ -720,6 +720,19 @@ In the multiple linear regression model, several predictors show statistically s
 
 Our third question for analysis was whether income can be predicted from commute time, location, and travel ability. To do this, we design a model to predict income and test it for prediction accuracy. 
 
+```{r}
+#| label: q3-model-prep
+#| echo: false
+#| warning: false
+
+#prevent N/A in values
+ pums_true <- pums_clean |> 
+    filter(is.na(PINCP) == FALSE) |>
+    filter(is.na(JWMNP) == FALSE) |>
+    filter(is.na(JWTRNS) == FALSE)
+
+```
+
 ### Q3: Exploratory Analysis
 
 First, we need to explore the dataset to see how variables are related to income.
@@ -781,19 +794,6 @@ Finally, we compare income based on geographic area. In the initial goal of this
 
 Based on our exploratory analysis. The model we want to go with is: 
 PINCP ~ JWMNP + VEH + factor(JWTRNS) + factor(PUMA)
-
-```{r}
-#| label: q3-model-prep
-#| echo: false
-#| warning: false
-
-#prevent N/A in values
- pums_true <- pums_clean |> 
-    filter(is.na(PINCP) == FALSE) |>
-    filter(is.na(JWMNP) == FALSE) |>
-    filter(is.na(JWTRNS) == FALSE)
-
-```
 
 
 ```{r}
@@ -903,9 +903,7 @@ There were a few obstacles we ran into on question 3. One was how best to evalua
 
 ## Conclusions
 
-Our analysis shows that income can be partially predicted using age, education, gender, and race. Education is the strongest predictor, with higher levels of education associated with substantially higher income. Age has a nonlinear relationship with income, with earnings increasing early in life, peaking in mid-career, and declining slightly thereafter. Gender and race also show statistically significant associations with income, even after controlling for other variables.
-
-Despite these significant relationships, the overall explanatory power of the model is modest (R² = 0.12), indicating that we may need to consider other variables as determinants of income. Going forward there are additional factors to consider. One would be exploring additional variables for positive associations with income that could be added to the model. Another option is testing interaction terms. We could also consider whether gender and race are impactful enough that we should really be developing separate models in order to accurately capture the full impact these categorical variables have on all other aspects. 
+Our analysis indicates that income can be partially predicted using a combination of demographic and socioeconomic factors, including age, education, gender, and race. Education shows a strong positive association with income, while age exhibits a nonlinear relationship, with earnings increasing early in life and leveling off in later years. Gender and race also demonstrate meaningful differences in income after controlling for other variables. The multiple linear regression model provides interpretable inference, though its overall explanatory power is modest (R² ≈ 0.12), reflecting the inherent variability in income. To complement this approach, LASSO regression was used to evaluate a broader set of predictors and identify a more parsimonious subset of variables. The LASSO results reinforce the importance of key demographic and labor-related factors while reducing model complexity, highlighting the value of combining interpretable models with regularization-based variable selection.
 
 The analysis shows that we can get a fairly accurate predictor of income based on only a general area zone, commute time, vehicle type, and availability of vehicles. Our predictor varied based on the test/training split but was fairly accurate on average. Further research with this model there are a lot of factors that could be considered such as housing type and rural/suburban/urban living environment, but both of these are outside the information captured by this dataset.
 
