@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 #| warning: false
 
 #install.packages("ggfortify")
-
+#install.packages("kableExtra")
 
 library(tidyverse)
 library(patchwork)
@@ -29,6 +29,8 @@ library(faraway)
 library(car)
 library(gt)
 library(scales)
+library(survey)
+library(kableExtra)
 ```
 
 ## Introduction
@@ -1443,6 +1445,8 @@ There were a few obstacles we ran into on question 3. One was how best to evalua
 Our analysis indicates that income can be partially predicted using a combination of demographic and socioeconomic factors, including age, education, gender, and race. Education shows a strong positive association with income, while age exhibits a nonlinear relationship, with earnings increasing early in life and leveling off in later years. Gender and race also demonstrate meaningful differences in income after controlling for other variables. The multiple linear regression model provides interpretable inference, though its overall explanatory power is modest (R² ≈ 0.12), reflecting the inherent variability in income. To complement this approach, LASSO regression was used to evaluate a broader set of predictors and identify a more parsimonious subset of variables. The LASSO results reinforce the importance of key demographic and labor-related factors while reducing model complexity, highlighting the value of combining interpretable models with regularization-based variable selection.
 
 The analysis shows that we can get a fairly accurate predictor of income based on only a general area zone, commute time, vehicle type, and availability of vehicles. Our predictor varied based on the test/training split but was fairly accurate on average. Further research with this model there are a lot of factors that could be considered such as housing type and rural/suburban/urban living environment, but both of these are outside the information captured by this dataset.
+
+The analysis suggests that non-citizens in Oregon face substantially higher odds of being uninsured (OR ~ 4.6 vs U.S.-born residents) even after adjusting for income, education, employment, and other demographics, indicating a large and persistent coverage gap. This gap is driven primarily by structural and legal eligibility barriers rather than socioeconomic differences, with only modest contributions from factors like education, employment, and age.
 
 
 ## Citations
