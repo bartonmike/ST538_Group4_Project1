@@ -738,54 +738,85 @@ Our third question for analysis was whether income can be predicted from commute
 First, we need to explore the dataset to see how variables are related to income.
 
 ```{r}
-#| label: q3-income-v-commute-time
+#| label: q3-incomevcommutetime
 #| echo: false
 #| warning: false
-ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
-  geom_point(alpha = 0.2) +
-  geom_smooth(method = "loess") +
-  labs(title = "Income vs Commute Time")+
-  theme_minimal()
+#| include: false
+
+# This takes a long time to run, adding if statement
+# so it only gets run when needed.
+outfile <- "./q3-incomevcommutetime-plot.png"
+
+if (!file.exists(outfile)) {
+  incomevcommutetime_plot <-ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
+    geom_point(alpha = 0.2) +
+    geom_smooth(method = "loess") +
+    scale_y_continuous(labels = label_number()) +
+    labs(title = "Income vs Commute Time", x = "Commute Time", y = "Income") +
+    theme_minimal()
+    ggsave(outfile, plot = incomevcommutetime_plot, width = 10, height = 6, dpi = 300)
+}
+
   
 ```
+![Relationship of personal income (PINCP) versus commute time (JWMNP)](./q3-incomevcommutetime-plot.png)
+
+
 
 In the above graph comparing commute time (JWMNP) and income (PINCP) we see a sort of conflicting trend in the data. The maximum salary appears to decrease as commutes increase, but there is also a significant cluster of people with shorter commutes that make less money. 
 
 ```{r}
-#| label: q3-income-v-commute-time-by-vehicle
+#| label: q3-incomevcommutetimebytravel
 #| echo: false
 #| warning: false
+#| include: false
 
-ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
-  geom_point(alpha = 0.2) +
-  geom_smooth(method = "loess") +
-  labs(title = "Income vs Commute Time by Travel Type") + 
-  facet_grid(rows = vars(JWTRNS))+
-  theme(strip.text.y = element_text(angle = 0))+
-  theme_minimal()
+# This takes a long time to run, adding if statement
+# so it only gets run when needed.
+outfile <- "./q3-incomevcommutetimebytravel-plot.png"
+
+if (!file.exists(outfile)) {
+  incomevcommutetimebytravel_plot <-ggplot(pums_clean, aes(x = JWMNP, y = PINCP)) +
+    geom_point(alpha = 0.2) +
+    geom_smooth(method = "loess") +
+    scale_y_continuous(labels = label_number()) +
+    labs(title = "Income vs Commute Time by Travel Type", x = "Commute Time", y = "Income") +
+    facet_grid(rows = vars(JWTRNS)) +
+    theme(strip.text.y = element_text(angle = 0))+
+    theme_minimal()
+    ggsave(outfile, plot = incomevcommutetimebytravel_plot, width = 10, height = 6, dpi = 300)
+}
 ```
+![Relationship of personal income (PINCP) versus commute time (JWMNP), faceted by type of travel (JWTRNS)](./q3-incomevcommutetimebytravel-plot.png)
 
 The above graphs compare commute time and income but separated by mode of transportation (JWTRNS). This breakdown shows in general, there appears to be a slight decline as the length of commute by any method increases and travel is overwhelmingly done by car.
 
 
 ```{r}
-#| label: q3-income-by-area
+#| label: q3-incomebyarea
 #| echo: false
 #| warning: false
- 
+#| include: false
 
-ggplot(pums_true, aes(x = factor(PUMA), y = PINCP)) +
+
+ outfile <- "./q3-incomebyarea-plot.png"
+
+if (!file.exists(outfile)) {
+  ggplot(pums_true, aes(x = factor(PUMA), y = PINCP)) +
   geom_boxplot() +
   coord_cartesian(ylim = c(0, 100000)) +
   labs(
     title = "Income by Area",
-    x = "Area",
+    x = "Area Code",
     y = "Income") +
   theme_minimal() +
+  scale_y_continuous(labels = label_number()) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  ggsave(outfile, plot = incomebyarea_plot, width = 10, height = 6, dpi = 300)
+}
 
 ```
-
+![Distribution of personal income (PINCP) by Area Code (PUMA)](./q3-incomebyarea-plot.png)
 
 Finally, we compare income based on geographic area. In the initial goal of this question, we wanted the comparison to be city vs suburban vs rural, but the dataset doesn't provide an effective way to determine that categorization.
 
