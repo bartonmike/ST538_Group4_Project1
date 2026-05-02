@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2026.4.30)  1 MAY 2026 17:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2026.4.30)  1 MAY 2026 18:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -744,24 +744,24 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 ) (./Kevinslides.aux)
 \openout1 = `Kevinslides.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -816,7 +816,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 33.
+Package hyperref Info: Link coloring OFF on input line 35.
  (./Kevinslides.out) (./Kevinslides.out)
 \@outlinefile=\write5
 \openout5 = `Kevinslides.out'.
@@ -840,50 +840,50 @@ Package caption Info: End \AtBeginDocument code.
 \c@mv@boldtabular=\count382
  (./Kevinslides.nav)
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 33.
+(Font)              `T1/Roboto-LF/regular/n' on input line 35.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 6.0pt on input line 33.
+(Font)              scaled to size 6.0pt on input line 35.
 
 
 Package hyperref Warning: Option `pdfauthor' has already been used,
-(hyperref)                setting the option has no effect on input line 37.
+(hyperref)                setting the option has no effect on input line 39.
 
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 51.
+(Font)              `T1/Roboto-LF/regular/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 14.4pt on input line 51.
+(Font)              scaled to size 14.4pt on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 51.
+(Font)              `T1/Roboto-LF/bold/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 14.4pt on input line 51.
+(Font)              scaled to size 14.4pt on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 51.
+(Font)              `T1/Roboto-LF/bold/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 8.0pt on input line 51.
+(Font)              scaled to size 8.0pt on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 51.
+(Font)              `T1/Roboto-LF/regular/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 10.0pt on input line 51.
+(Font)              scaled to size 10.0pt on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 51.
+(Font)              `T1/Roboto-LF/bold/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 10.0pt on input line 51.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 51.
+(Font)              scaled to size 10.0pt on input line 53.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 53.
 (c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 51.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 53.
  (c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 51.
+(Font)              `T1/Roboto-LF/bold/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 7.0pt on input line 51.
+(Font)              scaled to size 7.0pt on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 51.
+(Font)              `T1/Roboto-LF/regular/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 8.0pt on input line 51.
+(Font)              scaled to size 8.0pt on input line 53.
 
 
 
@@ -892,30 +892,39 @@ Overfull \hbox (45.52718pt too wide) has occurred while \output is active
  []
 
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 51.
+(Font)              `T1/Roboto-LF/regular/n' on input line 53.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 4.0pt on input line 51.
+(Font)              scaled to size 4.0pt on input line 53.
 [1
 
 {c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/roboto/rbto_b5rac7.enc} <./lib/layouts/intro_bg.pdf> <./lib/logos/infufgw.png> <./lib/logos/ufg_black.pdf>]
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 60.
+(Font)              `T1/Roboto-LF/bold/n' on input line 82.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 6.0pt on input line 60.
+(Font)              scaled to size 6.0pt on input line 82.
 
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 60--60
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 82--82
 [][][][]  
  []
 
-(./Kevinslides.toc)
+<C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-commute.png, id=49, 590.205pt x 351.11176pt>
+File: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-commute.png Graphic file (type png)
+<use C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-commute.png>
+Package pdftex.def Info: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-commute.png  used on input line 82.
+(pdftex.def)             Requested size: 187.14873pt x 111.3294pt.
+<C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-area.png, id=50, 593.21625pt x 351.714pt>
+File: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-area.png Graphic file (type png)
+<use C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-area.png>
+Package pdftex.def Info: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-area.png  used on input line 82.
+(pdftex.def)             Requested size: 187.14873pt x 110.95686pt.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 60.
+(Font)              `T1/Roboto-LF/regular/n' on input line 82.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 17.28pt on input line 60.
+(Font)              scaled to size 17.28pt on input line 82.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 60.
+(Font)              `T1/Roboto-LF/bold/n' on input line 82.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 17.28pt on input line 60.
+(Font)              scaled to size 17.28pt on input line 82.
 
 
 
@@ -930,27 +939,24 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 
 [2
 
- <./lib/layouts/vertical_bg.pdf> <./lib/logos/infufgw.png>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 82--82
+ <./lib/layouts/horizontal_bg.pdf> <./lib/logos/infufgw.png> <c:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-commute.png> <c:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-area.png>]
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 98--98
 [][][][]  
  []
 
-LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 9.0pt on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/m/it' aliased to
-(Font)              `T1/Roboto-LF/regular/it' on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/it' will be
-(Font)              scaled to size 9.0pt on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 12.0pt on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 82.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 12.0pt on input line 82.
+! Missing $ inserted.
+<inserted text> 
+                $
+l.98 \end{frame}
+                
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+<C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-predict.png, id=73, 572.73975pt x 353.52075pt>
+File: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-predict.png Graphic file (type png)
+<use C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-predict.png>
+Package pdftex.def Info: C:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-predict.png  used on input line 98.
+(pdftex.def)             Requested size: 243.29105pt x 150.1661pt.
 
 
 
@@ -965,278 +971,7 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 
 [3
 
-]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 112--112
-[][][][]  
- []
-
-LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 112.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 10.95pt on input line 112.
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[4
-
-]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 127--127
-[][][][]  
- []
-
-<readme/layouts.png, id=121, 1075.01625pt x 469.755pt>
-File: readme/layouts.png Graphic file (type png)
-<use readme/layouts.png>
-Package pdftex.def Info: readme/layouts.png  used on input line 127.
-(pdftex.def)             Requested size: 336.86542pt x 147.19948pt.
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[5
-
- <./readme/layouts.png>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 163--163
-[][][][]  
- []
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[6
-
-]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 194--194
-[][][][]  
- []
-
-
-! LaTeX Error: File `q3-income-v-commute-time-1' not found.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.194 \end{frame}
-                 
-I could not locate the file with any of these extensions:
-.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: File `q3-income-by-area-1' not found.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.194 \end{frame}
-                 
-I could not locate the file with any of these extensions:
-.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[7
-
-]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 205--205
-[][][][]  
- []
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 205.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 24.88pt on input line 205.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 205.
-LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 24.88pt on input line 205.
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[8
-
- <./lib/layouts/title_bg.pdf>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 225--225
-[][][][]  
- []
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[9
-
- <./lib/layouts/horizontal_bg.pdf> <./lib/logos/infufgw.png>]
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[10
-
-]
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[11
-
-]
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[12
-
-]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 260--260
-[][][][]  
- []
-
-<lib/logos/infw.png, id=195, 638.385pt x 215.30438pt>
-File: lib/logos/infw.png Graphic file (type png)
-<use lib/logos/infw.png>
-Package pdftex.def Info: lib/logos/infw.png  used on input line 260.
-(pdftex.def)             Requested size: 84.35669pt x 28.45274pt.
-
-Overfull \hbox (9.49835pt too wide) in paragraph at lines 260--260
- [][] 
- []
-
-<lib/logos/ufgw.png, id=196, 220.57407pt x 81.30376pt>
-File: lib/logos/ufgw.png Graphic file (type png)
-<use lib/logos/ufgw.png>
-Package pdftex.def Info: lib/logos/ufgw.png  used on input line 260.
-(pdftex.def)             Requested size: 77.19197pt x 28.45274pt.
-
-Overfull \hbox (2.33363pt too wide) in paragraph at lines 260--260
- [][] 
- []
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[13
-
- <./lib/logos/infw.png> <./lib/logos/ufgw.png>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 286--286
-[][][][]  
- []
-
-
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[14
-
-]
-
-
-Overfull \hbox (45.52718pt too wide) has occurred while \output is active
- [] 
- []
-
-
-Overfull \hbox (2.96399pt too wide) has occurred while \output is active
-[][][][] 
- []
-
-[15]
+ <./lib/layouts/vertical_bg.pdf> <./lib/logos/infufgw.png> <c:/Users/kevin/OneDrive/Documents/GitHub/ST538_Group4/Project 1_Presentation_Master/figures/q3-predict.PNG>]
 \tf@nav=\write6
 \openout6 = `Kevinslides.nav'.
 
@@ -1252,21 +987,21 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `Kevinslides.out' has not changed.
-(rerunfilecheck)             Checksum: 2074753EB3F1CEC4C82471164194A481;862.
+(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 28713 strings out of 475128
- 573166 string characters out of 5762968
- 904638 words of memory out of 5000000
- 51068 multiletter control sequences out of 15000+600000
- 669282 words of font info for 108 fonts, out of 8000000 for 9000
+ 28367 strings out of 475128
+ 566799 string characters out of 5762968
+ 901707 words of memory out of 5000000
+ 50767 multiletter control sequences out of 15000+600000
+ 631163 words of font info for 85 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 128i,19n,123p,445b,954s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Bold.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Regular.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on Kevinslides.pdf (15 pages, 4065397 bytes).
+ 128i,14n,123p,413b,957s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Bold.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Regular.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+Output written on Kevinslides.pdf (3 pages, 3136082 bytes).
 PDF statistics:
- 274 PDF objects out of 1000 (max. 8388607)
- 177 compressed objects within 2 object streams
- 42 named destinations out of 1000 (max. 500000)
- 154 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 119 PDF objects out of 1000 (max. 8388607)
+ 57 compressed objects within 1 object stream
+ 10 named destinations out of 1000 (max. 500000)
+ 98 words of extra memory for PDF output out of 10000 (max. 10000000)
 
