@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2026.4.30)  1 MAY 2026 17:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2026.4.30)  1 MAY 2026 17:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1032,9 +1032,37 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [6
 
 ]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 186--186
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 194--194
 [][][][]  
  []
+
+
+! LaTeX Error: File `q3-income-v-commute-time-1' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.194 \end{frame}
+                 
+I could not locate the file with any of these extensions:
+.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: File `q3-income-by-area-1' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.194 \end{frame}
+                 
+I could not locate the file with any of these extensions:
+.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
 
 
 
@@ -1051,7 +1079,7 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [7
 
 ]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 197--197
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 205--205
 [][][][]  
  []
 
@@ -1063,13 +1091,13 @@ Overfull \hbox (45.52718pt too wide) has occurred while \output is active
  []
 
 LaTeX Font Info:    Font shape `T1/Roboto-LF/m/n' aliased to
-(Font)              `T1/Roboto-LF/regular/n' on input line 197.
+(Font)              `T1/Roboto-LF/regular/n' on input line 205.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/regular/n' will be
-(Font)              scaled to size 24.88pt on input line 197.
+(Font)              scaled to size 24.88pt on input line 205.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/b/n' aliased to
-(Font)              `T1/Roboto-LF/bold/n' on input line 197.
+(Font)              `T1/Roboto-LF/bold/n' on input line 205.
 LaTeX Font Info:    Font shape `T1/Roboto-LF/bold/n' will be
-(Font)              scaled to size 24.88pt on input line 197.
+(Font)              scaled to size 24.88pt on input line 205.
 
 Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [][][][] 
@@ -1078,7 +1106,7 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [8
 
  <./lib/layouts/title_bg.pdf>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 217--217
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 225--225
 [][][][]  
  []
 
@@ -1139,27 +1167,27 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [12
 
 ]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 252--252
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 260--260
 [][][][]  
  []
 
-<lib/logos/infw.png, id=193, 638.385pt x 215.30438pt>
+<lib/logos/infw.png, id=195, 638.385pt x 215.30438pt>
 File: lib/logos/infw.png Graphic file (type png)
 <use lib/logos/infw.png>
-Package pdftex.def Info: lib/logos/infw.png  used on input line 252.
+Package pdftex.def Info: lib/logos/infw.png  used on input line 260.
 (pdftex.def)             Requested size: 84.35669pt x 28.45274pt.
 
-Overfull \hbox (9.49835pt too wide) in paragraph at lines 252--252
+Overfull \hbox (9.49835pt too wide) in paragraph at lines 260--260
  [][] 
  []
 
-<lib/logos/ufgw.png, id=194, 220.57407pt x 81.30376pt>
+<lib/logos/ufgw.png, id=196, 220.57407pt x 81.30376pt>
 File: lib/logos/ufgw.png Graphic file (type png)
 <use lib/logos/ufgw.png>
-Package pdftex.def Info: lib/logos/ufgw.png  used on input line 252.
+Package pdftex.def Info: lib/logos/ufgw.png  used on input line 260.
 (pdftex.def)             Requested size: 77.19197pt x 28.45274pt.
 
-Overfull \hbox (2.33363pt too wide) in paragraph at lines 252--252
+Overfull \hbox (2.33363pt too wide) in paragraph at lines 260--260
  [][] 
  []
 
@@ -1178,7 +1206,7 @@ Overfull \hbox (2.96399pt too wide) has occurred while \output is active
 [13
 
  <./lib/logos/infw.png> <./lib/logos/ufgw.png>]
-Overfull \hbox (2.96399pt too wide) in paragraph at lines 278--278
+Overfull \hbox (2.96399pt too wide) in paragraph at lines 286--286
 [][][][]  
  []
 
@@ -1227,18 +1255,18 @@ Package rerunfilecheck Info: File `Kevinslides.out' has not changed.
 (rerunfilecheck)             Checksum: 2074753EB3F1CEC4C82471164194A481;862.
  ) 
 Here is how much of TeX's memory you used:
- 28649 strings out of 475128
- 571090 string characters out of 5762968
- 904534 words of memory out of 5000000
- 51006 multiletter control sequences out of 15000+600000
+ 28713 strings out of 475128
+ 573166 string characters out of 5762968
+ 904638 words of memory out of 5000000
+ 51068 multiletter control sequences out of 15000+600000
  669282 words of font info for 108 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 128i,19n,123p,445b,750s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,19n,123p,445b,954s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Bold.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/google/roboto/Roboto-Regular.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/Users/kevin/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on Kevinslides.pdf (15 pages, 4065589 bytes).
+Output written on Kevinslides.pdf (15 pages, 4065397 bytes).
 PDF statistics:
- 272 PDF objects out of 1000 (max. 8388607)
- 175 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 500000)
+ 274 PDF objects out of 1000 (max. 8388607)
+ 177 compressed objects within 2 object streams
+ 42 named destinations out of 1000 (max. 500000)
  154 words of extra memory for PDF output out of 10000 (max. 10000000)
 
