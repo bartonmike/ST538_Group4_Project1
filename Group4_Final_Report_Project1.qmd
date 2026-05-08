@@ -1,5 +1,5 @@
 ---
-title: "Group 4 Project 1: Interim Report"
+title: "Group 4 Project 1: Final Report"
 author: Paul Anderson, Michael Barton, Kevin Kincaid
 format: pdf
 ---
@@ -18,7 +18,6 @@ knitr::opts_chunk$set(
 #| warning: false
 
 #install.packages("ggfortify")
-#install.packages("kableExtra")
 
 library(tidyverse)
 library(patchwork)
@@ -30,7 +29,6 @@ library(car)
 library(gt)
 library(scales)
 library(survey)
-library(kableExtra)
 ```
 
 ## Introduction
@@ -974,7 +972,7 @@ Occupation (OCCP) is excluded from the Q2 model even though it is available in t
 
 ```{r}
 #| label: q2-full-model
-#| echo: false
+#| include: false
 #| cache: true
 
 # Full model
@@ -1006,7 +1004,7 @@ vif(model_q2_full)
 ```
 ```{r}
 #| label: q2-reduced-model
-#| echo: false
+#| include: false
 #| cache: true
 
 # Reduced model
@@ -1207,7 +1205,7 @@ tibble(
 ### Q2: Results
 The reduced model (citizenship + income) shows a large raw gap: non-citizens have 6.18 times higher odds of being uninsured than U.S.-born residents (95% CI: 4.99–7.64, p < 0.001). Naturalized citizens show a small, borderline elevation (OR = 1.16, p = 0.071).
 
-In the full model, all major predictor blocks significantly improve fit—education (F = 114.8), employment (F = 289.1), age (F = 311.9), race (F = 14.1), and Hispanic origin (F = 5.75), all p < 0.05—except household size (F = 2.86, p = 0.125). Model fit increases (pseudo R²: 0.075 → 0.135).
+In the full model, all major predictor blocks significantly improve fit—education (F = 114.8), employment (F = 289.1), age (F = 311.9), race (F = 14.1), and Hispanic origin (F = 5.75), all p < 0.05—except household size (F = 2.86, p = 0.125). Model fit increases (pseudo $R^2$: 0.075 → 0.135).
 
 The citizenship gap remains large even after adjustment: non-citizens still have 4.64 times higher odds of being uninsured (95% CI: 3.88–5.55), and naturalized citizens also remain at higher risk (OR = 1.31, p = 0.007). This indicates that the gap is only partly explained by socioeconomic factors.
 
@@ -1238,7 +1236,6 @@ Our third question for analysis was whether income can be predicted from commute
     filter(is.na(PINCP) == FALSE) |>
     filter(is.na(JWMNP) == FALSE) |>
     filter(is.na(JWTRNS) == FALSE)
-
 ```
 
 ### Q3: Exploratory Analysis
@@ -1264,8 +1261,6 @@ if (!file.exists(outfile)) {
     theme_minimal()
     ggsave(outfile, plot = incomevcommutetime_plot, width = 10, height = 6, dpi = 300)
 }
-
-  
 ```
 ![Relationship of personal income (PINCP) versus commute time (JWMNP)](./q3-incomevcommutetime-plot.png)
 
@@ -1444,9 +1439,9 @@ There were a few obstacles we ran into on question 3. One was how best to evalua
 
 Our analysis indicates that income can be partially predicted using a combination of demographic and socioeconomic factors, including age, education, gender, and race. Education shows a strong positive association with income, while age exhibits a nonlinear relationship, with earnings increasing early in life and leveling off in later years. Gender and race also demonstrate meaningful differences in income after controlling for other variables. The multiple linear regression model provides interpretable inference, though its overall explanatory power is modest (R² ≈ 0.12), reflecting the inherent variability in income. To complement this approach, LASSO regression was used to evaluate a broader set of predictors and identify a more parsimonious subset of variables. The LASSO results reinforce the importance of key demographic and labor-related factors while reducing model complexity, highlighting the value of combining interpretable models with regularization-based variable selection.
 
-The analysis shows that we can get a fairly accurate predictor of income based on only a general area zone, commute time, vehicle type, and availability of vehicles. Our predictor varied based on the test/training split but was fairly accurate on average. Further research with this model there are a lot of factors that could be considered such as housing type and rural/suburban/urban living environment, but both of these are outside the information captured by this dataset.
-
 The analysis suggests that non-citizens in Oregon face substantially higher odds of being uninsured (OR ~ 4.6 vs U.S.-born residents) even after adjusting for income, education, employment, and other demographics, indicating a large and persistent coverage gap. This gap is driven primarily by structural and legal eligibility barriers rather than socioeconomic differences, with only modest contributions from factors like education, employment, and age.
+
+The analysis shows that we can get a fairly accurate predictor of income based on only a general area zone, commute time, vehicle type, and availability of vehicles. Our predictor varied based on the test/training split but was fairly accurate on average. Further research with this model there are a lot of factors that could be considered such as housing type and rural/suburban/urban living environment, but both of these are outside the information captured by this dataset.
 
 
 ## Citations
@@ -1464,5 +1459,4 @@ all_chunks <- setdiff(knitr::all_labels(), c("appendix-collect", "appendix"))
 ```{r appendix, ref.label=all_chunks}
 #| echo: true
 #| eval: false
-
 ```
